@@ -242,7 +242,8 @@ function getThemeCss() {
   --font-body: 'DM Sans', system-ui, sans-serif;
   --bg: #0a0a0c;
   --bg-gradient: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 211, 238, 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(139, 92, 246, 0.08), transparent);
+    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(139, 92, 246, 0.08), transparent),
+    radial-gradient(ellipse 50% 30% at 20% 60%, rgba(250, 204, 21, 0.1), transparent);
   --surface: #141416;
   --surface-elevated: #1c1c1f;
   --text: #fafafa;
@@ -250,6 +251,9 @@ function getThemeCss() {
   --accent: #22d3ee;
   --accent-hover: #67e8f9;
   --accent-soft: rgba(34, 211, 238, 0.2);
+  --yellow: #eab308;
+  --yellow-hover: #facc15;
+  --yellow-soft: rgba(234, 179, 8, 0.2);
   --radius: 14px;
   --radius-lg: 20px;
   --space: 1.5rem;
@@ -307,7 +311,7 @@ body {
   line-height: 1.05;
   letter-spacing: -0.04em;
   margin: 0 0 0.4em;
-  background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--text-muted) 100%);
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 35%, var(--yellow) 65%, var(--text-muted) 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -340,6 +344,7 @@ body {
   border-radius: 8px;
   color: var(--accent);
   border: 1px solid var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--yellow-soft);
 }
 
 /* Demo section + example component (vanilla CSS animation) */
@@ -374,7 +379,7 @@ body {
 .demo-card:focus-within {
   transform: translateY(-4px);
   border-color: var(--accent-soft);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px var(--accent-soft);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px var(--accent-soft), 0 0 24px var(--yellow-soft);
 }
 .demo-card-badge {
   display: inline-block;

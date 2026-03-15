@@ -1,8 +1,21 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import http from 'node:http';
+import os from 'node:os';
 import { runBuild } from './build.js';
 import { loadConfig } from './loadConfig.js';
+
+/** @returns {string | null} First non-internal IPv4 address for Network URL */
+function getLocalNetworkAddress() {
+  const ifaces = os.networkInterfaces();
+  for (const addrs of Object.values(ifaces)) {
+    if (!addrs) continue;
+    for (const a of addrs) {
+      if (a.family === 'IPv4' && !a.internal) return a.address;
+    }
+  }
+  return null;
+}
 
 /** @type {import('node:fs').FSWatcher | null} */
 let watcher = null;
@@ -27,11 +40,17 @@ export async function runDev(cwd) {
     magenta: '\x1b[35m',
   };
   console.log('');
-  console.log(c.cyan + '    ___     ');
-  console.log(c.cyan + '   /   \\   ');
-  console.log(c.cyan + '  | o o |  ' + c.reset + c.dim + '  Bite my shiny metal...');
-  console.log(c.cyan + '  |  ^  |  ' + c.reset);
-  console.log(c.cyan + '   \\___/   ' + c.reset);
+  console.log(c.cyan + '       .     ');
+  console.log(c.cyan + '       |     ');
+  console.log(c.cyan + '       |     ');
+  console.log(c.cyan + "    ,-'\"`-.   ");
+  console.log(c.cyan + "  ,'       `. ");
+  console.log(c.cyan + '  |  _____  | ' + c.reset + c.dim + '     .-( HEY baby,lets go out)');
+  console.log(c.cyan + '  | (_o_o_) | ' + c.reset + c.dim + "   ,'    ( and kill all humans.)");
+  console.log(c.cyan + "  |         | ,-'");
+  console.log(c.cyan + '  | |HHHHH| | ');
+  console.log(c.cyan + '  | |HHHHH| | ');
+  console.log(c.cyan + "-'`-._____.-'`-" + c.reset);
   console.log('');
   await runBuild(cwd);
 
@@ -48,7 +67,8 @@ export async function runDev(cwd) {
 
   const liveReloadScript = "(function(){var e=new EventSource('/__mini_astro_live');e.onmessage=function(){e.close();location.reload();};})();";
 
-  const port = 2323;
+  const port = Number.parseInt(process.env.PORT || '2323', 10) || 2323;
+  const host = '0.0.0.0';
   const server = http.createServer((req, res) => {
     const urlPath = req.url?.split('?')[0] || '/';
 
@@ -92,9 +112,13 @@ export async function runDev(cwd) {
     clients.forEach((r) => { try { r.write('data: reload\n\n'); } catch {} });
   }
 
-  server.listen(port, () => {
+  server.listen(port, host, () => {
     const relSrc = path.relative(cwd, srcDir).replace(/\\/g, '/') || 'src';
+    const networkAddr = getLocalNetworkAddress();
     console.log(c.green + '  ◆\x1b[0m ' + c.bold + 'Local\x1b[0m   ' + c.cyan + 'http://localhost:' + port + c.reset);
+    if (networkAddr) {
+      console.log(c.green + '  ◆\x1b[0m ' + c.bold + 'Network\x1b[0m ' + c.cyan + 'http://' + networkAddr + ':' + port + c.reset);
+    }
     console.log(c.silver + '  ◆\x1b[0m Watch    ' + c.reset + relSrc);
     console.log('');
     console.log(c.dim + '  Ready. Edit and save to reload.\x1b[0m');
