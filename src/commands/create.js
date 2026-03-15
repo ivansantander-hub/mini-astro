@@ -114,7 +114,7 @@ function getBaseTemplate(cookiesStrict, csp) {
   <title>{{ title }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/theme.css">`;
   if (csp) {
     head += `\n  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; img-src 'self' data:;">`;
@@ -241,7 +241,7 @@ function getConsentJs() {
 function getThemeCss() {
   return `/* mini-astro default theme — landing, cookie modal, demo component */
 :root {
-  --font-display: 'Syne', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
   --font-body: 'DM Sans', system-ui, sans-serif;
   --bg: #0a0a0c;
   --bg-gradient: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 211, 238, 0.15), transparent),
@@ -276,7 +276,7 @@ body {
   position: relative;
 }
 
-/* Lava lamp — animated organic blobs (no JS, reduced motion respected) */
+/* Lava lamp — blobs drift across screen (left/right, up/down, organic paths) */
 .lava-bg {
   position: fixed;
   inset: 0;
@@ -287,60 +287,71 @@ body {
 .lava-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(70px);
   will-change: transform;
 }
 .lava-blob-1 {
-  width: min(80vmax, 480px);
-  height: min(80vmax, 480px);
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.22) 0%, transparent 70%);
-  top: -15%;
-  left: -10%;
+  width: min(75vmax, 420px);
+  height: min(75vmax, 420px);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.28) 0%, transparent 65%);
+  top: 10%;
+  left: 5%;
 }
 .lava-blob-2 {
-  width: min(60vmax, 360px);
-  height: min(60vmax, 360px);
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
-  bottom: -10%;
-  right: -5%;
+  width: min(65vmax, 380px);
+  height: min(65vmax, 380px);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.22) 0%, transparent 65%);
+  top: 50%;
+  left: 60%;
 }
 .lava-blob-3 {
-  width: min(50vmax, 320px);
-  height: min(50vmax, 320px);
-  background: radial-gradient(circle, rgba(250, 204, 21, 0.12) 0%, transparent 70%);
-  top: 40%;
-  left: 50%;
+  width: min(55vmax, 340px);
+  height: min(55vmax, 340px);
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.18) 0%, transparent 65%);
+  top: 70%;
+  left: 20%;
 }
 @media (prefers-reduced-motion: no-preference) {
   .lava-blob-1 {
-    animation: lava-float-1 20s ease-in-out infinite;
+    animation: lava-drift-1 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   }
   .lava-blob-2 {
-    animation: lava-float-2 26s ease-in-out infinite;
-    animation-delay: -5s;
+    animation: lava-drift-2 32s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation-delay: -8s;
   }
   .lava-blob-3 {
-    animation: lava-float-3 24s ease-in-out infinite;
-    animation-delay: -12s;
+    animation: lava-drift-3 26s cubic-bezier(0.35, 0.1, 0.65, 0.9) infinite;
+    animation-delay: -16s;
   }
 }
-@keyframes lava-float-1 {
+/* Blob 1: drifts right → up → left → down (winding) */
+@keyframes lava-drift-1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  20% { transform: translate(12%, -15%) scale(1.12); }
-  40% { transform: translate(-10%, 8%) scale(0.92); }
-  60% { transform: translate(8%, 12%) scale(1.08); }
-  80% { transform: translate(-14%, -6%) scale(0.98); }
+  12% { transform: translate(25%, -5%) scale(1.08); }
+  25% { transform: translate(35%, -18%) scale(0.95); }
+  38% { transform: translate(15%, -25%) scale(1.12); }
+  50% { transform: translate(-20%, -15%) scale(0.92); }
+  62% { transform: translate(-30%, 5%) scale(1.05); }
+  75% { transform: translate(-15%, 20%) scale(0.98); }
+  88% { transform: translate(5%, 10%) scale(1.1); }
 }
-@keyframes lava-float-2 {
+/* Blob 2: left → down → right → up */
+@keyframes lava-drift-2 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-12%, 10%) scale(1.1); }
-  50% { transform: translate(10%, -12%) scale(0.94); }
-  75% { transform: translate(-8%, -8%) scale(1.06); }
+  15% { transform: translate(-22%, 8%) scale(1.06); }
+  30% { transform: translate(-28%, 22%) scale(0.93); }
+  45% { transform: translate(-10%, 28%) scale(1.1); }
+  60% { transform: translate(18%, 12%) scale(0.96); }
+  75% { transform: translate(28%, -12%) scale(1.04); }
+  90% { transform: translate(12%, -18%) scale(0.99); }
 }
-@keyframes lava-float-3 {
+/* Blob 3: up → right → down → left */
+@keyframes lava-drift-3 {
   0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  33% { transform: translate(calc(-50% + 14%), calc(-50% - 10%)) scale(1.15); }
-  66% { transform: translate(calc(-50% - 10%), calc(-50% + 12%)) scale(0.9); }
+  20% { transform: translate(calc(-50% - 8%), calc(-50% - 25%)) scale(1.12); }
+  40% { transform: translate(calc(-50% + 20%), calc(-50% - 15%)) scale(0.94); }
+  60% { transform: translate(calc(-50% + 28%), calc(-50% + 15%)) scale(1.08); }
+  80% { transform: translate(calc(-50% - 5%), calc(-50% + 20%)) scale(0.97); }
 }
 
 /* Site nav — layout for all pages */
@@ -386,17 +397,17 @@ body {
 .landing-title {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(2.75rem, 12vw, 5rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: clamp(2.5rem, 11vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
   margin: 0 0 0.4em;
-  padding-right: 0.08em;
+  padding: 0 0.15em 0 0;
   overflow: visible;
-  background: linear-gradient(135deg, #fff 0%, var(--accent) 35%, var(--yellow) 65%, var(--text-muted) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text);
+  text-shadow:
+    0 0 20px var(--accent-soft),
+    0 0 40px rgba(34, 211, 238, 0.15),
+    0 2px 0 rgba(0,0,0,0.2);
   animation: landing-title-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   opacity: 0;
   transform: translateY(0.5em);
