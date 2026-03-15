@@ -66,7 +66,8 @@ export async function runCreate(projectDir, projectName, opts = {}) {
     fs.writeFileSync(path.join(projectDir, 'src', 'pages', 'privacidad.html'), getPrivacidadPage(), 'utf8');
   }
 
-  fs.writeFileSync(path.join(projectDir, 'src', 'data', 'site.json'), '{\n  "title": "' + name + '"\n}\n', 'utf8');
+  const siteJson = { title: name, repository: '' };
+  fs.writeFileSync(path.join(projectDir, 'src', 'data', 'site.json'), JSON.stringify(siteJson, null, 2), 'utf8');
 
   const config = `export default {
   srcDir: 'src',
@@ -152,6 +153,7 @@ title: Home
   <div class="landing-hero">
     <h1 class="landing-title">Hello humans</h1>
     <p class="landing-tagline">A minimal start. Edit <code>src/pages/index.html</code> and make it yours.</p>
+    <p class="landing-repo"><a href="{{ site.site.repository }}">Repository</a></p>
   </div>
   <section class="landing-demo" aria-label="Card example">
     <h2 class="landing-demo-title">Card</h2>
@@ -438,6 +440,15 @@ body {
   border: 1px solid var(--accent-soft);
   box-shadow: 0 0 0 1px var(--yellow-soft);
 }
+.landing-repo {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+}
+.landing-repo a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.landing-repo a:hover { color: var(--accent); }
 
 /* Demo section + example component (vanilla CSS animation) */
 .landing-demo {
