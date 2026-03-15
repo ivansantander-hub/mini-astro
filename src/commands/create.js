@@ -276,7 +276,7 @@ body {
   position: relative;
 }
 
-/* Lava lamp — slow organic blobs (no JS, reduced motion respected) */
+/* Lava lamp — animated organic blobs (no JS, reduced motion respected) */
 .lava-bg {
   position: fixed;
   inset: 0;
@@ -290,54 +290,57 @@ body {
   filter: blur(80px);
   will-change: transform;
 }
+.lava-blob-1 {
+  width: min(80vmax, 480px);
+  height: min(80vmax, 480px);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.22) 0%, transparent 70%);
+  top: -15%;
+  left: -10%;
+}
+.lava-blob-2 {
+  width: min(60vmax, 360px);
+  height: min(60vmax, 360px);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+  bottom: -10%;
+  right: -5%;
+}
+.lava-blob-3 {
+  width: min(50vmax, 320px);
+  height: min(50vmax, 320px);
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.12) 0%, transparent 70%);
+  top: 40%;
+  left: 50%;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .lava-blob {
-    animation: lava-float 24s ease-in-out infinite;
-  }
   .lava-blob-1 {
-    width: min(80vmax, 480px);
-    height: min(80vmax, 480px);
-    background: radial-gradient(circle, rgba(34, 211, 238, 0.22) 0%, transparent 70%);
-    top: -15%;
-    left: -10%;
-    animation-duration: 22s;
-    animation-delay: 0s;
+    animation: lava-float-1 20s ease-in-out infinite;
   }
   .lava-blob-2 {
-    width: min(60vmax, 360px);
-    height: min(60vmax, 360px);
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
-    bottom: -10%;
-    right: -5%;
-    animation-duration: 28s;
-    animation-delay: -7s;
+    animation: lava-float-2 26s ease-in-out infinite;
+    animation-delay: -5s;
   }
   .lava-blob-3 {
-    width: min(50vmax, 320px);
-    height: min(50vmax, 320px);
-    background: radial-gradient(circle, rgba(250, 204, 21, 0.12) 0%, transparent 70%);
-    top: 40%;
-    left: 50%;
-    animation-duration: 26s;
-    animation-delay: -14s;
+    animation: lava-float-3 24s ease-in-out infinite;
+    animation-delay: -12s;
   }
 }
-@keyframes lava-float {
+@keyframes lava-float-1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(5%, -8%) scale(1.08); }
-  50% { transform: translate(-6%, 4%) scale(0.95); }
-  75% { transform: translate(4%, 6%) scale(1.05); }
+  20% { transform: translate(12%, -15%) scale(1.12); }
+  40% { transform: translate(-10%, 8%) scale(0.92); }
+  60% { transform: translate(8%, 12%) scale(1.08); }
+  80% { transform: translate(-14%, -6%) scale(0.98); }
 }
-.lava-blob-2 { animation-name: lava-float-alt; }
-@keyframes lava-float-alt {
+@keyframes lava-float-2 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-4%, 5%) scale(1.06); }
-  66% { transform: translate(6%, -4%) scale(0.97); }
+  25% { transform: translate(-12%, 10%) scale(1.1); }
+  50% { transform: translate(10%, -12%) scale(0.94); }
+  75% { transform: translate(-8%, -8%) scale(1.06); }
 }
-.lava-blob-3 { animation-name: lava-float-slow; }
-@keyframes lava-float-slow {
+@keyframes lava-float-3 {
   0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(calc(-50% + 8%), calc(-50% - 6%)) scale(1.1); }
+  33% { transform: translate(calc(-50% + 14%), calc(-50% - 10%)) scale(1.15); }
+  66% { transform: translate(calc(-50% - 10%), calc(-50% + 12%)) scale(0.9); }
 }
 
 /* Site nav — layout for all pages */
