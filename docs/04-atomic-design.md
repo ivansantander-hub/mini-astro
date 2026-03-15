@@ -1,23 +1,23 @@
 # Atomic Design
 
-mini-astro organiza el proyecto siguiendo **Atomic Design** de forma estricta: **quarks → atoms → molecules → organisms → templates → pages**. Esta es la base de cómo trabajar en el proyecto.
+mini-astro organizes the project following **Atomic Design** strictly: **quarks → atoms → molecules → organisms → templates → pages**. This is the basis for how to work in the project.
 
-## Jerarquía (de abajo hacia arriba)
+## Hierarchy (bottom to top)
 
-| Nivel | Carpeta | Uso | CLI |
-|-------|---------|-----|-----|
-| **0. Quarks** | `src/quarks/` | Design tokens (colores, espaciado, tipografía). No son componentes UI. | `mini-astro quarks` (ver ruta) |
-| **1. Atoms** | `src/atoms/` | Bloques mínimos: botones, inputs, iconos, etiquetas. | `mini-astro component <name> atom` |
-| **2. Molecules** | `src/molecules/` | Agrupaciones de atoms: cards, formularios simples, CookieConsentBar. | `mini-astro component <name> molecule` |
-| **3. Organisms** | `src/organisms/` | Secciones de página: header, footer, listas, galerías. | `mini-astro component <name> organism` |
-| **4. Templates** | `src/templates/` | Layouts con `<slot />`; sin contenido final. | `mini-astro template <name>` |
-| **5. Pages** | `src/pages/` | Páginas finales (file-based routing). | `mini-astro route <name>` |
+| Level | Folder | Use | CLI |
+|-------|--------|-----|-----|
+| **0. Quarks** | `src/quarks/` | Design tokens (colors, spacing, typography). Not UI components. | `mini-astro quarks` (show path) |
+| **1. Atoms** | `src/atoms/` | Minimal blocks: buttons, inputs, icons, labels. | `mini-astro component <name> atom` |
+| **2. Molecules** | `src/molecules/` | Groups of atoms: cards, simple forms, CookieConsentBar. | `mini-astro component <name> molecule` |
+| **3. Organisms** | `src/organisms/` | Page sections: header, footer, lists, galleries. | `mini-astro component <name> organism` |
+| **4. Templates** | `src/templates/` | Layouts with `<slot />`; no final content. | `mini-astro template <name>` |
+| **5. Pages** | `src/pages/` | Final pages (file-based routing). | `mini-astro route <name>` |
 
-Regla de composición: cada nivel solo usa niveles inferiores. Atoms usan quarks (tokens); molecules usan atoms; organisms usan molecules y atoms; templates usan organisms; pages usan templates y componentes.
+Composition rule: each level only uses lower levels. Atoms use quarks (tokens); molecules use atoms; organisms use molecules and atoms; templates use organisms; pages use templates and components.
 
-## Estructura de carpetas
+## Folder structure
 
-Dentro de `src/` (o el `srcDir` configurado):
+Inside `src/` (or the configured `srcDir`):
 
 ```
 src/
@@ -27,36 +27,36 @@ src/
   organisms/   → SiteHeader.html, Footer.html, …
   templates/   → Base.html, Blog.html, …
   pages/       → index.html, about.html, blog/post.html, …
-  data/        → site.json (datos globales, expuestos como site)
+  data/        → site.json (global data, exposed as site)
 ```
 
-El scaffold incluye un **átomo** de ejemplo (`NavLink`) y un **organismo** (`SiteHeader`). El template Base usa `<mini-include src="organisms/SiteHeader" />`; SiteHeader usa a su vez `<mini-include src="atoms/NavLink" />` para cada enlace del nav.
+The scaffold includes an example **atom** (`NavLink`) and an **organism** (`SiteHeader`). The Base template uses `<mini-include src="organisms/SiteHeader" />`; SiteHeader in turn uses `<mini-include src="atoms/NavLink" />` for each nav link.
 
-## Quarks (nivel 0)
+## Quarks (level 0)
 
-- **No son componentes**: son valores (colores, espaciado, tipografía, bordes, sombras).
-- Fuente única de verdad para el diseño. En mini-astro se incluye `src/quarks/tokens.json` por defecto; tu `public/css/theme.css` puede reflejar esos tokens (variables CSS).
-- Comando: `mini-astro quarks` muestra la ruta de `quarks/` y su contenido.
+- **Not components**: they are values (colors, spacing, typography, borders, shadows).
+- Single source of truth for design. mini-astro includes `src/quarks/tokens.json` by default; your `public/css/theme.css` can reflect those tokens (CSS variables).
+- Command: `mini-astro quarks` shows the path to `quarks/` and its contents.
 
 ## Atoms, molecules, organisms
 
-- Se referencian con `<mini-include src="Nombre" />` (o `atoms/Nombre`, `molecules/Nombre`, `organisms/Nombre`).
-- **Resolución**: si no se indica capa, se busca en orden atoms → molecules → organisms; la primera coincidencia gana.
-- **Nombres**: PascalCase, archivo `Nombre.html` (ej. `CookieConsentBar.html`).
+- Referenced with `<mini-include src="Name" />` (or `atoms/Name`, `molecules/Name`, `organisms/Name`).
+- **Resolution**: if layer is not specified, search order is atoms → molecules → organisms; first match wins.
+- **Names**: PascalCase, file `Name.html` (e.g. `CookieConsentBar.html`).
 
-## Templates y pages
+## Templates and pages
 
-- **Templates**: se eligen con `layout: Nombre` en el frontmatter de la página; el archivo es `src/templates/Nombre.html`. No se incluyen con `<mini-include>`.
-- **Pages**: cada archivo en `src/pages/` genera una ruta (URLs limpias). Ver [Páginas y routing](05-paginas-y-routing.md).
+- **Templates**: chosen with `layout: Name` in the page frontmatter; the file is `src/templates/Name.html`. They are not included with `<mini-include>`.
+- **Pages**: each file in `src/pages/` generates a route (clean URLs). See [Pages and routing](05-pages-and-routing.md).
 
-## CLI y autocomplete
+## CLI and autocomplete
 
-- Ver todos los comandos: `mini-astro help` o `mini-astro --help`.
-- Ayuda por comando: `mini-astro help component`, `mini-astro component --help`, etc.
-- Autocomplete en la terminal:
-  - Bash: `source <(mini-astro completion bash)` (o añadir a `~/.bashrc`).
-  - Zsh: `source <(mini-astro completion zsh)` (o añadir a `~/.zshrc`).
+- List all commands: `mini-astro help` or `mini-astro --help`.
+- Help per command: `mini-astro help component`, `mini-astro component --help`, etc.
+- Terminal autocomplete:
+  - Bash: `source <(mini-astro completion bash)` (or add to `~/.bashrc`).
+  - Zsh: `source <(mini-astro completion zsh)` (or add to `~/.zshrc`).
 
-## Siguiente paso
+## Next step
 
-- [Páginas y routing](05-paginas-y-routing.md) — Rutas basadas en archivos y frontmatter.
+- [Pages and routing](05-pages-and-routing.md) — File-based routes and frontmatter.

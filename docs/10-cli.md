@@ -1,111 +1,110 @@
 # CLI
 
-El CLI de mini-astro se ejecuta con **`npx mini-astro`** o **`mini-astro`** si está instalado globalmente. Todos los comandos se ejecutan en el directorio actual salvo que se indique **`-C, --cwd`**.
+The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if installed globally. All commands run in the current directory unless **`-C, --cwd`** is given.
 
-## Opciones globales
+## Global options
 
-| Opción | Descripción |
+| Option | Description |
 |--------|-------------|
-| `-C, --cwd <path>` | Directorio del proyecto (donde está `mini-astro.config.js`). Por defecto: `process.cwd()`. |
-| `-h, --help` | Muestra la ayuda y sale. |
+| `-C, --cwd <path>` | Project directory (where `mini-astro.config.js` is). Default: `process.cwd()`. |
+| `-h, --help` | Show help and exit. |
 
-## Comandos
+## Commands
 
-### `init [nombre]`
+### `init [name]`
 
-- **Uso**: `mini-astro init` o `mini-astro init mi-sitio`
-- **Descripción**: Inicialización interactiva. Pregunta por:
-  - Nombre del proyecto (o usa el argumento si lo pasas)
-  - Banner de cookies estricto (Sí/No)
-  - Generación de páginas de políticas (Cookies y Privacidad)
-  - CSP estricta por defecto
-  - **Puerto del dev server** (por defecto **2323**); se guarda en `mini-astro.config.js` como `dev.port`
-  - **Package manager**: **pnpm** (por defecto), **yarn** o **npm**
-- Con las respuestas llama a **create** y genera el proyecto. Al terminar imprime el puerto elegido y los comandos para instalar y arrancar.
+- **Usage**: `mini-astro init` or `mini-astro init my-site`
+- **Description**: Interactive setup. Prompts for:
+  - Project name (or uses the argument if provided)
+  - Strict cookie banner (Yes/No)
+  - Generate policy pages (Cookies and Privacy)
+  - Strict CSP by default
+  - **Dev server port** (default **2323**); saved in `mini-astro.config.js` as `dev.port`
+  - **Package manager**: **pnpm** (default), **yarn** or **npm**
+- With your answers it calls **create** and generates the project. When done it prints the chosen port and the commands to install and start.
 
-### `create [nombre]`
+### `create [name]`
 
-- **Uso**: `mini-astro create` o `mini-astro create mi-sitio`
-- **Descripción**:  
-  - **Con nombre** (`create mi-sitio`): Crea el proyecto en `<cwd>/mi-sitio` sin preguntas. Usa opciones por defecto (cookies, policy pages, CSP) y **pnpm** como package manager.  
-  - **Sin nombre** (`create`): Lanza el flujo **interactivo** igual que **init** (nombre, cookies, políticas, CSP, package manager).
-- Genera: carpetas Atomic Design + public/css (incl. `theme.css`), Base.html, landing **“Hello humans”** en index.html, CookieConsentBar y páginas de políticas si aplica, site.json, config, package.json (con `packageManager: "pnpm@9.0.0"` si es pnpm). Si el directorio ya existe, lanza error.
+- **Usage**: `mini-astro create` or `mini-astro create my-site`
+- **Description**:  
+  - **With name** (`create my-site`): Creates the project in `<cwd>/my-site` without prompts. Uses default options (cookies, policy pages, CSP) and **pnpm** as package manager.  
+  - **Without name** (`create`): Runs the **interactive** flow like **init** (name, cookies, policies, CSP, package manager).
+- Generates: Atomic Design folders + public/css (incl. `theme.css`), Base.html, “Hello humans” landing in index.html, CookieConsentBar and policy pages if applicable, site.json, config, package.json (with `packageManager: "pnpm@9.0.0"` if pnpm). If the directory already exists, throws an error.
 
-### `new [nombre]`
+### `new [name]`
 
-- **Uso**: `mini-astro new` o `mini-astro new mi-sitio`
-- Alias de **create**. Sin nombre usa por defecto `my-site` como nombre del proyecto (crea `<cwd>/my-site`).
+- **Usage**: `mini-astro new` or `mini-astro new my-site`
+- Alias for **create**. Without name uses `my-site` as the default project name (creates `<cwd>/my-site`).
 
 ### `build`
 
-- **Uso**: `mini-astro build` (desde la raíz del proyecto o con `-C`).
-- **Descripción**: Carga la config, carga datos de `dataDir`, copia `public/` a `outDir`, procesa todas las páginas de `src/pages/` (frontmatter, layout, slot, includes, vars) y escribe el resultado en `outDir`. Imprime el número de páginas generadas.
+- **Usage**: `mini-astro build` (from project root or with `-C`).
+- **Description**: Loads config, loads data from `dataDir`, copies `public/` to `outDir`, processes all pages in `src/pages/` (frontmatter, layout, slot, includes, vars) and writes the result to `outDir`. Prints the number of pages generated.
 
 ### `dev`
 
-- **Uso**: `mini-astro dev`
-- **Descripción**: Ejecuta un build y luego inicia un servidor HTTP que sirve `outDir` (por defecto `dist/`) en el puerto **2323** (o `PORT`). Si está instalado **chokidar**, observa `srcDir` y al detectar cambios vuelve a hacer build y envía un evento de live reload a los clientes conectados a `/__mini_astro_live`. En cada respuesta HTML se inyecta un script que abre ese SSE y recarga la página al recibir el evento.
-- Sin chokidar, el servidor sigue funcionando pero no hay recarga automática.
+- **Usage**: `mini-astro dev`
+- **Description**: Runs a build and then starts an HTTP server that serves `outDir` (default `dist/`) on port **2323** (or `dev.port` from config, or `PORT` env). If **chokidar** is installed, it watches `srcDir` and on changes runs the build again and sends a live reload event to clients connected to `/__mini_astro_live`. Each HTML response injects a script that opens that SSE and reloads the page on event.
+- Without chokidar, the server still runs but there is no automatic reload.
 
-### `route <nombre>` / `page <nombre>` / `add [page] <nombre>`
+### `route <name>` / `page <name>` / `add [page] <name>`
 
-- **Uso**: `mini-astro route about`, `mini-astro page blog/post`, `mini-astro add page contacto`
-- **Descripción**: Crea una página en `src/pages/` (Atomic: pages). `route blog/post` crea `src/pages/blog/post.html`; la URL será `/blog/post`. Contenido: placeholder con `layout: Base` y título derivado del nombre. **page** y **add** son alias de **route**; con **add**, si el primer argumento es `page` se ignora.
+- **Usage**: `mini-astro route about`, `mini-astro page blog/post`, `mini-astro add page contact`
+- **Description**: Creates a page in `src/pages/` (Atomic: pages). `route blog/post` creates `src/pages/blog/post.html`; the URL will be `/blog/post`. Content: placeholder with `layout: Base` and title derived from the name. **page** and **add** are aliases of **route**; with **add**, if the first argument is `page` it is ignored.
 
 ### `quarks`
 
-- **Uso**: `mini-astro quarks`
-- **Descripción**: Muestra la ruta de **quarks** (design tokens) y lista los archivos en `src/quarks/`. Nivel 0 de Atomic Design; no son componentes UI.
+- **Usage**: `mini-astro quarks`
+- **Description**: Shows the **quarks** path (design tokens) and lists files in `src/quarks/`. Atomic Design level 0; not UI components.
 
-### `component <nombre> [capa]`
+### `component <name> [layer]`
 
-- **Uso**: `mini-astro component Button atom`, `mini-astro component Card molecule`, `mini-astro component Header organism`
-- **Descripción**: Crea un componente en la capa indicada (por defecto **molecule**). Capas: **atom** | **molecule** | **organism** (o en plural: atoms, molecules, organisms). Crea `src/<capa>/<nombre>.html`.
+- **Usage**: `mini-astro component Button atom`, `mini-astro component Card molecule`, `mini-astro component Header organism`
+- **Description**: Creates a component in the given layer (default **molecule**). Layers: **atom** | **molecule** | **organism** (or plural: atoms, molecules, organisms). Creates `src/<layer>/<name>.html`.
 
-### `template <nombre>`
+### `template <name>`
 
-- **Uso**: `mini-astro template Blog`
-- **Descripción**: Crea un layout en `src/templates/<nombre>.html` con estructura mínima (html, head, body, `<slot />`). Las páginas lo usan con `layout: Nombre` en el frontmatter.
-
+- **Usage**: `mini-astro template Blog`
+- **Description**: Creates a layout in `src/templates/<name>.html` with minimal structure (html, head, body, `<slot />`). Pages use it with `layout: Name` in the frontmatter.
 
 ### `completion [bash|zsh]`
 
-- **Uso**: `mini-astro completion bash` o `mini-astro completion zsh`
-- **Descripción**: Escribe en stdout el script de autocompletado para la shell. Instalación:
-  - **Bash**: `source <(mini-astro completion bash)` (o añadir a `~/.bashrc`).
-  - **Zsh**: `source <(mini-astro completion zsh)` (o añadir a `~/.zshrc`).
+- **Usage**: `mini-astro completion bash` or `mini-astro completion zsh`
+- **Description**: Writes the shell completion script to stdout. Installation:
+  - **Bash**: `source <(mini-astro completion bash)` (or add to `~/.bashrc`).
+  - **Zsh**: `source <(mini-astro completion zsh)` (or add to `~/.zshrc`).
 
 ### `add [type]`
 
-- **Uso**: `mini-astro add` o `mini-astro add atom`
-- **Descripción**: Modo interactivo para crear cualquier nivel de Atomic Design. Si no pasas **type**, pregunta qué crear (atom / molecule / organism / template / page). Luego pide el **nombre** (y para páginas, el **layout** por defecto). Equivalente a ejecutar `component`, `template` o `route` sin argumentos para que pidan los datos.
+- **Usage**: `mini-astro add` or `mini-astro add atom`
+- **Description**: Interactive mode to create any Atomic Design level. If you do not pass **type**, it asks what to create (atom / molecule / organism / template / page). Then it asks for the **name** (and for pages, the default **layout**). Equivalent to running `component`, `template` or `route` without arguments so they prompt for the data.
 
-### `help [comando]`
+### `help [command]`
 
-- **Uso**: `mini-astro help`, `mini-astro help component`, `mini-astro component --help`
-- **Descripción**: Muestra la ayuda general o la ayuda del comando indicado.
+- **Usage**: `mini-astro help`, `mini-astro help component`, `mini-astro component --help`
+- **Description**: Shows general help or help for the given command.
 
-## Ejemplos
+## Examples
 
 ```bash
-# Crear proyecto interactivo
+# Create project interactively
 npx mini-astro init
-npx mini-astro init mi-portfolio
+npx mini-astro init my-portfolio
 
-# Crear proyecto sin preguntas
-npx mini-astro create mi-sitio
+# Create project without prompts
+npx mini-astro create my-site
 
-# Build y dev (desde la raíz del proyecto)
+# Build and dev (from project root)
 npx mini-astro build
 npx mini-astro dev
 
-# Crear página y componente
-npx mini-astro route contacto
-npx mini-astro route blog/entrada
+# Create page and component
+npx mini-astro route contact
+npx mini-astro route blog/post
 npx mini-astro component Card
-npx mini-astro component Header organisms
+npx mini-astro component Header organism
 ```
 
-## Siguiente paso
+## Next step
 
-- [Dev server](11-dev-server.md) — Detalles del servidor de desarrollo y live reload.
+- [Dev server](11-dev-server.md) — Development server details and live reload.

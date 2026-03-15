@@ -96,8 +96,10 @@ Design tokens — colors, spacing, typography, radii. Single source of truth for
 
   if (policyPages) {
     fs.writeFileSync(path.join(projectDir, 'src', 'pages', 'cookies.html'), getCookiesPage(), 'utf8');
-    fs.writeFileSync(path.join(projectDir, 'src', 'pages', 'privacidad.html'), getPrivacidadPage(), 'utf8');
+    fs.writeFileSync(path.join(projectDir, 'src', 'pages', 'privacy.html'), getPrivacyPage(), 'utf8');
   }
+
+  fs.writeFileSync(path.join(projectDir, 'public', 'js', 'nav-active.js'), getNavActiveJs(), 'utf8');
 
   const siteJson = {
     title: name,
@@ -144,6 +146,18 @@ function getNavLinkAtom() {
   return '<a href="{{ href }}" class="site-nav-link">{{ label }}</a>';
 }
 
+/** Client-side: mark current nav link as active (CSP-safe, no inline script) */
+function getNavActiveJs() {
+  return `(function(){
+  var pathname = (window.location.pathname || '').replace(/\\/$/, '') || '/';
+  document.querySelectorAll('.site-nav-link').forEach(function(a) {
+    var href = (a.getAttribute('href') || '').replace(/\\/$/, '') || '/';
+    if (href === pathname) a.classList.add('active');
+  });
+})();
+`;
+}
+
 /** Organism: site header with nav (Atomic Design level 3). Uses atoms/NavLink */
 function getSiteHeaderOrganism(cookiesStrict) {
   const links = [
@@ -151,7 +165,7 @@ function getSiteHeaderOrganism(cookiesStrict) {
   ];
   if (cookiesStrict) {
     links.push('<mini-include src="atoms/NavLink" href="/cookies" label="Cookies" />');
-    links.push('<mini-include src="atoms/NavLink" href="/privacidad" label="Privacy" />');
+    links.push('<mini-include src="atoms/NavLink" href="/privacy" label="Privacy" />');
   }
   return `<nav class="site-nav" aria-label="Main">
   ${links.join('\n  ')}
@@ -184,6 +198,7 @@ function getBaseTemplate(cookiesStrict, csp) {
   </div>${cookieBar}
   <mini-include src="organisms/SiteHeader" />
   <slot />${consentScript}
+  <script src="/js/nav-active.js"></script>
 </body>
 </html>
 `;
@@ -191,7 +206,7 @@ function getBaseTemplate(cookiesStrict, csp) {
 
 function getIndexPage(cookiesStrict) {
   const policyLinks = cookiesStrict
-    ? '\n  <footer class="landing-footer"><a href="/cookies">Cookie Policy</a> · <a href="/privacidad">Privacy</a></footer>'
+    ? '\n  <footer class="landing-footer"><a href="/cookies">Cookie Policy</a> · <a href="/privacy">Privacy</a></footer>'
     : '';
   return `---
 layout: Base
@@ -221,7 +236,7 @@ function getCookieConsentBar() {
   <div class="cookie-consent-card">
     <h2 class="cookie-consent-title">We value your privacy</h2>
     <p class="cookie-consent-text">We use essential cookies to run the site. Optional cookies help us improve experience. You choose.</p>
-    <p class="cookie-consent-links"><a href="/cookies">Cookie Policy</a> · <a href="/privacidad">Privacy</a></p>
+    <p class="cookie-consent-links"><a href="/cookies">Cookie Policy</a> · <a href="/privacy">Privacy</a></p>
     <div class="cookie-consent-actions">
       <button type="button" id="cookie-decline" class="cookie-consent-decline">Decline optional</button>
       <button type="button" id="cookie-accept" class="cookie-consent-accept">Accept all</button>
@@ -236,7 +251,7 @@ function getConsentJs() {
   var key = 'mini-astro-consent';
   var body = document.body;
   var path = window.location.pathname || '';
-  var isPolicyPage = /\\/(cookies|privacidad)(\\.html)?$/i.test(path) || path.endsWith('/cookies') || path.endsWith('/privacidad');
+  var isPolicyPage = /\\/(cookies|privacy)(\\.html)?$/i.test(path) || path.endsWith('/cookies') || path.endsWith('/privacy');
 
   function setConsent(value) {
     try { localStorage.setItem(key, value); } catch (e) {}
@@ -430,6 +445,8 @@ body {
 .site-nav a[href="/"]:hover,
 .site-nav .site-nav-link[href="/"]:hover { color: var(--accent); }
 .site-nav .site-nav-link { text-decoration: none; }
+.site-nav-link.active { color: var(--text); }
+.site-nav-link.active:hover { color: var(--accent); }
 
 /* Landing — entrance animation */
 .landing {
@@ -805,14 +822,14 @@ title: Cookie Policy
 `;
 }
 
-function getPrivacidadPage() {
+function getPrivacyPage() {
   return `---
 layout: Base
-title: Privacidad
+title: Privacy Policy
 ---
 <main>
-  <h1>Privacidad</h1>
-  <p>Describe tu política de privacidad aquí. Edit <code>src/pages/privacidad.html</code>.</p>
+  <h1>Privacy Policy</h1>
+  <p>Describe your privacy policy here. Edit <code>src/pages/privacy.html</code>.</p>
 </main>
 `;
 }

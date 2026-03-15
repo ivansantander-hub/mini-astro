@@ -41,7 +41,7 @@ pnpm dev
 | `mini-astro init` | Interactive: project name, cookies, policies, CSP, package manager (pnpm/yarn/npm) |
 | `mini-astro create [name]` | New project with optional name (default: pnpm) |
 | `mini-astro build` | Build to `dist/` |
-| `mini-astro dev` | Dev server (port 3000) + watch + live reload |
+| `mini-astro dev` | Dev server (port 2323 by default) + watch + live reload |
 | `mini-astro route <name>` | Add page `src/pages/<name>.html` |
 | `mini-astro component <name> [atoms\|molecules\|organisms]` | Add component |
 
@@ -75,9 +75,9 @@ export default {
 
 Set `cookies.strict: false` or `security.csp: false` to relax defaults.
 
-## Documentación
+## Documentation
 
-Documentación técnica completa en **[docs/](docs/README.md)**: arquitectura, configuración, Atomic Design, componentes, templates, datos, seguridad, CLI, dev server y guía de uso.
+Full technical documentation in **[docs/](docs/README.md)**: architecture, configuration, Atomic Design, components, templates, data, security, CLI, dev server and usage guide.
 
 ## License
 

@@ -1,26 +1,26 @@
-# mini-astro — Documentación
+# mini-astro — Documentation
 
-Documentación técnica y guías de uso del framework **mini-astro**.
+Technical documentation and usage guides for the **mini-astro** framework.
 
-## Índice
+## Index
 
-| Documento | Contenido |
-|-----------|-----------|
-| [Introducción](01-introduccion.md) | Qué es mini-astro, filosofía, pilares y características |
-| [Arquitectura](02-arquitectura.md) | Estructura del paquete, módulos y flujo de build |
-| [Configuración](03-configuracion.md) | `mini-astro.config.js` y opciones disponibles |
-| [Atomic Design](04-atomic-design.md) | Estructura atoms/molecules/organisms, resolución de componentes |
-| [Páginas y routing](05-paginas-y-routing.md) | File-based routing, frontmatter y convenciones |
-| [URLs limpias y resolución en el servidor](05b-urls-limpias.md) | Por qué algunas URLs no llevan .html; directory index y servidor |
-| [Componentes](06-componentes.md) | `<mini-include>`, props, uso de `{{ }}` y casos especiales |
-| [Templates](07-templates.md) | Layouts, `<slot />` y variables en templates |
-| [Datos](08-datos.md) | `src/data/`, carga de JSON y uso en páginas |
-| [Seguridad](09-seguridad.md) | Cookies, CSP, páginas de políticas y configuración |
-| [CLI](10-cli.md) | Comandos: init, create, build, dev, route, component |
-| [Dev server](11-dev-server.md) | Servidor de desarrollo, watch y live reload |
-| [Guía de uso](12-guia-de-uso.md) | Flujo completo: crear proyecto, editar y desplegar |
-| [Referencia rápida](13-referencia-rapida.md) | Sintaxis, estructura, comandos y limitaciones |
+| Document | Content |
+|---------|---------|
+| [Introduction](01-introduction.md) | What mini-astro is, philosophy, pillars and features |
+| [Architecture](02-architecture.md) | Package structure, modules and build flow |
+| [Configuration](03-configuration.md) | `mini-astro.config.js` and available options |
+| [Atomic Design](04-atomic-design.md) | Atoms/molecules/organisms structure, component resolution |
+| [Pages and routing](05-pages-and-routing.md) | File-based routing, frontmatter and conventions |
+| [Clean URLs and server resolution](05b-clean-urls.md) | Why some URLs omit .html; directory index and server |
+| [Components](06-components.md) | `<mini-include>`, props, `{{ }}` usage and special cases |
+| [Templates](07-templates.md) | Layouts, `<slot />` and template variables |
+| [Data](08-data.md) | `src/data/`, JSON loading and use in pages |
+| [Security](09-security.md) | Cookies, CSP, policy pages and configuration |
+| [CLI](10-cli.md) | Commands: init, create, build, dev, route, component |
+| [Dev server](11-dev-server.md) | Development server, watch and live reload |
+| [Usage guide](12-usage-guide.md) | Full flow: create project, edit and deploy |
+| [Quick reference](13-quick-reference.md) | Syntax, structure, commands and limitations |
 
 ---
 
-Para una vista rápida, empieza por [Introducción](01-introduccion.md), [Guía de uso](12-guia-de-uso.md) o [Referencia rápida](13-referencia-rapida.md).
+For a quick overview, start with [Introduction](01-introduction.md), [Usage guide](12-usage-guide.md) or [Quick reference](13-quick-reference.md).

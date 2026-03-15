@@ -1,28 +1,28 @@
 # Templates
 
-Los **templates** son layouts que definen la estructura común de las páginas (doctype, head, body, cabecera, pie, etc.) y dejan un hueco para el contenido de cada página mediante un **slot**.
+**Templates** are layouts that define the common structure of pages (doctype, head, body, header, footer, etc.) and leave a place for each page’s content via a **slot**.
 
-## Ubicación
+## Location
 
-- Directorio: `src/templates/` (relativo al `srcDir`).
-- Cada archivo es un layout: `Base.html`, `Blog.html`, etc. La página elige el layout con el frontmatter `layout: Base`.
-- El scaffold genera un **Base** con navbar (Home y, si aplica, Cookies y Privacy) para poder volver al inicio desde cualquier página.
+- Directory: `src/templates/` (relative to `srcDir`).
+- Each file is a layout: `Base.html`, `Blog.html`, etc. The page chooses the layout with frontmatter `layout: Base`.
+- The scaffold generates a **Base** template with navbar (Home and, if applicable, Cookies and Privacy) so you can return to the home page from any page.
 
 ## Slot
 
-En el HTML del template, el contenido de la página se inyecta donde pongas:
+In the template HTML, the page content is injected where you put:
 
 - **`<slot />`**  
-  o  
-- **`<!-- @slot -->`** (insensible a mayúsculas)
+  or  
+- **`<!-- @slot -->`** (case-insensitive)
 
-Solo se reemplaza la **primera** ocurrencia. Si pones varios, solo el primero se sustituye por el body de la página.
+Only the **first** occurrence is replaced. If you add more, only the first is substituted with the page body.
 
-Ejemplo:
+Example:
 
 ```html
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>{{ title }}</title>
@@ -35,29 +35,29 @@ Ejemplo:
 </html>
 ```
 
-## Variables en templates
+## Variables in templates
 
-Puedes usar **variables** con la sintaxis `{{ clave }}` o `{{ site.clave }}`:
+You can use **variables** with the syntax `{{ key }}` or `{{ site.key }}`:
 
-- **Clave simple**: proviene del frontmatter de la página (ej. `{{ title }}`) o del contexto inyectado (ej. `site`).
-- **Con punto**: para propiedades anidadas, por ejemplo `{{ site.title }}`, `{{ site.description }}`. El motor resuelve el “path” sobre el objeto contexto.
+- **Simple key**: comes from the page frontmatter (e.g. `{{ title }}`) or from the injected context (e.g. `site`).
+- **With dot**: for nested properties, e.g. `{{ site.title }}`, `{{ site.description }}`. The engine resolves the “path” over the context object.
 
-Todas las sustituciones usan el **pageContext** (frontmatter + `site`). No hay condicionales ni bucles en el lenguaje de templates; solo sustitución de cadenas.
+All substitutions use **pageContext** (frontmatter + `site`). There are no conditionals or loops in the template language; only string substitution.
 
-## Orden de operaciones en el build
+## Build operation order
 
-1. Se carga el template según `layout`.
-2. **replaceVars(template, pageContext)** en el template (sustituye `{{ title }}`, `{{ site.xxx }}`, etc.).
-3. **replaceSlot(template, body)** — se reemplaza `<slot />` por el HTML de la página.
-4. **resolveIncludes(html)** — se resuelven todos los `<mini-include>` (incluidos los que estén en el template o en el body).
-5. **replaceVars(html, pageContext)** de nuevo sobre el HTML completo.
+1. The template is loaded according to `layout`.
+2. **replaceVars(template, pageContext)** on the template (replaces `{{ title }}`, `{{ site.xxx }}`, etc.).
+3. **replaceSlot(template, body)** — `<slot />` is replaced by the page HTML.
+4. **resolveIncludes(html)** — all `<mini-include>` are resolved (including those in the template or body).
+5. **replaceVars(html, pageContext)** again on the full HTML.
 
-Así, el template puede contener tanto variables como componentes; el body de la página también.
+So the template can contain both variables and components; the page body can too.
 
-## Template por defecto
+## Default template
 
-Si en el frontmatter no se pone `layout` o la página no tiene frontmatter, se usa el layout **Base** (`src/templates/Base.html`). Debe existir para que el scaffold y la mayoría de sitios funcionen.
+If `layout` is not set in the frontmatter or the page has no frontmatter, the **Base** layout (`src/templates/Base.html`) is used. It must exist for the scaffold and most sites to work.
 
-## Siguiente paso
+## Next step
 
-- [Datos](08-datos.md) — Uso de `src/data/` y `site`.
+- [Data](08-data.md) — Using `src/data/` and `site`.

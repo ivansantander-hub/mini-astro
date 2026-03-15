@@ -1,38 +1,38 @@
 # Dev server
 
-El comando **`mini-astro dev`** inicia un servidor de desarrollo que sirve el sitio generado y opcionalmente recarga el navegador al cambiar archivos.
+The **`mini-astro dev`** command starts a development server that serves the built site and optionally reloads the browser when files change.
 
-## Comportamiento
+## Behaviour
 
-1. **Build inicial**  
-   Ejecuta `runBuild(cwd)` una vez. El resultado queda en `outDir` (por defecto `dist/`).
+1. **Initial build**  
+   Runs `runBuild(cwd)` once. The result is in `outDir` (default `dist/`).
 
-2. **Watch (opcional)**  
-   Si el paquete **chokidar** está disponible, se observa el directorio `srcDir` (por defecto `src/`). En cada cambio se vuelve a ejecutar el build y se hace **broadcast** a los clientes de live reload.
+2. **Watch (optional)**  
+   If the **chokidar** package is available, the `srcDir` directory (default `src/`) is watched. On each change the build runs again and a **broadcast** is sent to live reload clients.
 
-3. **Servidor HTTP**  
-   Escucha en el puerto **2323** por defecto (configurable con la variable de entorno `PORT`) y en **0.0.0.0** para acceso en la red local. Sirve archivos estáticos desde `outDir`:
-   - Petición a `/` → sirve `dist/index.html`.
-   - **URLs limpias**: `/cookies` o `/cookies/` se resuelven a `dist/cookies/index.html` (o, en builds antiguos, a `dist/cookies.html`). Cualquier ruta sin extensión se busca primero como `<ruta>/index.html` y luego como `<ruta>.html`. El resto de paths se resuelven a archivos bajo `dist/` (sin salir del directorio). Se usan tipos MIME habituales (HTML, CSS, JS, imágenes, etc.).
-   - En la consola se muestran las URLs **Local** (`http://localhost:PORT`) y **Network** (`http://<IP-local>:PORT`) cuando hay una interfaz de red disponible.
+3. **HTTP server**  
+   Listens on port **2323** by default (from config `dev.port`, then env `PORT`) and on **0.0.0.0** for access on the local network. It serves static files from `outDir`:
+   - Request to `/` → serves `dist/index.html`.
+   - **Clean URLs**: `/cookies` or `/cookies/` resolve to `dist/cookies/index.html` (or, in older builds, to `dist/cookies.html`). Any path without extension is tried first as `<path>/index.html` then as `<path>.html`. Other paths resolve to files under `dist/` (without leaving the directory). Common MIME types are used (HTML, CSS, JS, images, etc.).
+   - The console shows **Local** (`http://localhost:PORT`) and **Network** (`http://<local-IP>:PORT`) URLs when a network interface is available.
 
 4. **Live reload**  
-   - Ruta **`/__mini_astro_live`**: Server-Sent Events; el cliente recibe un evento `reload` cuando hay un cambio.
-   - Ruta **`/__mini_astro_reload.js`**: script externo que abre `EventSource('/__mini_astro_live')` y recarga la página al recibir el evento. En cada respuesta HTML se inyecta `<script src="/__mini_astro_reload.js"></script>` (sin script inline), para no violar CSP `script-src 'self'`.
+   - Route **`/__mini_astro_live`**: Server-Sent Events; the client receives a `reload` event when there is a change.
+   - Route **`/__mini_astro_reload.js`**: external script that opens `EventSource('/__mini_astro_live')` and reloads the page on event. Each HTML response injects `<script src="/__mini_astro_reload.js"></script>` (no inline script), so CSP `script-src 'self'` is not violated.
 
-Si **chokidar** no está instalado, el servidor sigue funcionando pero no hay watch ni eventos de reload; tendrás que hacer build manual y recargar el navegador a mano.
+If **chokidar** is not installed, the server still runs but there is no watch or reload; you must run the build manually and reload the browser yourself.
 
-## Dependencia opcional
+## Optional dependency
 
-- **chokidar**: para watch del directorio `src/` y notificación de cambios. Instalación en el proyecto: `npm install chokidar` (o añadirlo como dependencia del proyecto que usa mini-astro). El paquete mini-astro puede listarlo como optionalDependency.
+- **chokidar**: for watching the `src/` directory and change notification. Install in the project: `npm install chokidar` (or add it as a dependency of the project that uses mini-astro). The mini-astro package can list it as an optionalDependency.
 
-## Puerto y red
+## Port and network
 
-- **Puerto por defecto**: 2323. Se puede cambiar con la variable de entorno `PORT` (p. ej. `PORT=3000 mini-astro dev`).
-- **Host**: el servidor escucha en `0.0.0.0`, así que el sitio es accesible desde otras máquinas de la red local mediante la IP que se muestra como **Network** al arrancar.
+- **Default port**: 2323 (from `mini-astro.config.js` `dev.port` at create, or env `PORT`, e.g. `PORT=3000 mini-astro dev`).
+- **Host**: the server listens on `0.0.0.0`, so the site is reachable from other machines on the local network via the IP shown as **Network** when starting.
 
-Para el concepto de URLs limpias y cómo el servidor resuelve `/` frente a rutas con `.html`, ver [URLs limpias y resolución en el servidor](05b-urls-limpias.md).
+For the concept of clean URLs and how the server resolves `/` vs routes with `.html`, see [Clean URLs and server resolution](05b-clean-urls.md).
 
-## Siguiente paso
+## Next step
 
-- [Guía de uso](12-guia-de-uso.md) — Flujo completo desde cero hasta build y despliegue.
+- [Usage guide](12-usage-guide.md) — Full flow from scratch to build and deploy.
