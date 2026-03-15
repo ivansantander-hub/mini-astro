@@ -62,18 +62,13 @@ En ambos casos, la “limpieza” de la URL es una **combinación de qué genera
 
 ## Comportamiento actual de mini-astro
 
-Hoy, mini-astro:
+mini-astro genera **URLs limpias** por defecto:
 
-- Genera **un archivo HTML por página** con la misma ruta relativa: `src/pages/foo.html` → `dist/foo.html`, `src/pages/blog/post.html` → `dist/blog/post.html`.
-- La raíz `/` se sirve con `dist/index.html` (el dev server y la mayoría de servidores hacen esta asignación explícita).
-- **No** genera por defecto carpetas `nombre/index.html` para cada página; por tanto, las URLs son **literales**: `/foo.html`, `/blog/post.html`.
+- **Raíz**: `src/pages/index.html` → `dist/index.html` → URL `/`.
+- **Resto de páginas**: `src/pages/foo.html` → `dist/foo/index.html`, de modo que la URL sea `/foo` o `/foo/`. El servidor (dev server o host estático) resuelve por **directory index** (`/foo/` → `foo/index.html`).
+- El **dev server** además acepta `/foo` sin barra final y sirve `foo/index.html` (o `foo.html` en builds antiguos).
 
-Para obtener URLs sin `.html` en producción tienes dos caminos:
-
-1. **Configurar el servidor** (Nginx, Apache, Vercel, Netlify, etc.) para que reescriba `/about` → `about.html`, o para que `/about/` busque `about/index.html` si en el futuro el build generara esa estructura.
-2. **Usar una opción de build** (si mini-astro la incorpora) que escriba `dist/about/index.html` en lugar de `dist/about.html`; entonces un servidor con directory index serviría `/about/` sin extensión.
-
-Nada sobrenatural: misma idea que en Astro, Next.js o Nuxt — convención de archivos más comportamiento del servidor.
+Así, navegas a `/cookies` y no a `/cookies.html`. En producción, cualquier host que resuelva índices de directorio (Nginx, Apache, Netlify, Vercel, etc.) sirve esas URLs sin configuración extra.
 
 ## Por qué importan las URLs limpias
 

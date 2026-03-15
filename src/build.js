@@ -61,7 +61,9 @@ export async function runBuild(cwd) {
     const pageContext = { ...frontmatter, ...contextBase };
     html = replaceVars(html, pageContext);
 
-    const outPath = path.join(outDir, relPath);
+    // Clean URLs: index.html → dist/index.html; anything else → dist/<name>/index.html
+    const outRel = relPath === 'index.html' ? 'index.html' : relPath.replace(/\.html$/i, '') + '/index.html';
+    const outPath = path.join(outDir, outRel);
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
     fs.writeFileSync(outPath, html, 'utf8');
   }

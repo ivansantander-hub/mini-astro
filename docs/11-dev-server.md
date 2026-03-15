@@ -12,8 +12,8 @@ El comando **`mini-astro dev`** inicia un servidor de desarrollo que sirve el si
 
 3. **Servidor HTTP**  
    Escucha en el puerto **2323** por defecto (configurable con la variable de entorno `PORT`) y en **0.0.0.0** para acceso en la red local. Sirve archivos estáticos desde `outDir`:
-   - Petición a `/` → sirve `dist/index.html` (resolución de índice).
-   - Cualquier otra ruta se resuelve de forma **literal** a un archivo bajo `dist/` (p. ej. `/cookies.html` → `dist/cookies.html`). No hay reescritura de URLs; el path solicitado debe coincidir con el archivo (sin salir del directorio por seguridad). Se usan tipos MIME habituales (HTML, CSS, JS, imágenes, etc.).
+   - Petición a `/` → sirve `dist/index.html`.
+   - **URLs limpias**: `/cookies` o `/cookies/` se resuelven a `dist/cookies/index.html` (o, en builds antiguos, a `dist/cookies.html`). Cualquier ruta sin extensión se busca primero como `<ruta>/index.html` y luego como `<ruta>.html`. El resto de paths se resuelven a archivos bajo `dist/` (sin salir del directorio). Se usan tipos MIME habituales (HTML, CSS, JS, imágenes, etc.).
    - En la consola se muestran las URLs **Local** (`http://localhost:PORT`) y **Network** (`http://<IP-local>:PORT`) cuando hay una interfaz de red disponible.
 
 4. **Live reload**  

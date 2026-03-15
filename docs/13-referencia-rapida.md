@@ -18,7 +18,7 @@ src/
   molecules/   → componentes pequeños
   organisms/   → bloques de página
   templates/   → layouts (Base.html, etc.)
-  pages/       → file-based routing (*.html → misma ruta en dist; URLs con .html)
+  pages/       → file-based routing (*.html → dist/<ruta>/index.html; URLs limpias sin .html)
   data/        → *.json → site.nombreArchivo
 ```
 
@@ -44,7 +44,7 @@ Tras crear el proyecto: `pnpm install` (o yarn/npm) y `pnpm dev`. Por defecto se
 
 ## URLs y servidor
 
-- Rutas: una por archivo en `src/pages/`; salida en `dist/` con la misma ruta (p. ej. `about.html` → `/about.html`). La raíz `/` se sirve con `dist/index.html`. Para URLs sin `.html` (limpias), ver [05b-urls-limpias.md](05b-urls-limpias.md).
+- Rutas: una por archivo en `src/pages/`; salida en `dist/` como `<ruta>/index.html` (p. ej. `cookies.html` → `dist/cookies/index.html` → URL `/cookies`). La raíz `/` es `dist/index.html`. Ver [05b-urls-limpias.md](05b-urls-limpias.md).
 
 ## Limitaciones
 

@@ -17,6 +17,27 @@ function getLocalNetworkAddress() {
   return null;
 }
 
+/**
+ * Resolve clean URL to file path relative to outDir. Supports /cookies → cookies/index.html or cookies.html.
+ * @param {string} outDir
+ * @param {string} urlPath - e.g. '/' or '/cookies' or '/cookies/'
+ * @returns {string | null} Relative path to file, or null
+ */
+function resolveCleanUrl(outDir, urlPath) {
+  if (urlPath === '/') return 'index.html';
+  const clean = urlPath.replace(/^\/+|\/+$/g, '').replace(/\\/g, '/');
+  if (!clean) return 'index.html';
+  const withIndex = clean + '/index.html';
+  const withHtml = clean.endsWith('.html') ? clean : clean + '.html';
+  if (fs.existsSync(path.join(outDir, withIndex))) return withIndex;
+  if (fs.existsSync(path.join(outDir, withHtml))) return withHtml;
+  if (fs.existsSync(path.join(outDir, clean))) {
+    const stat = fs.statSync(path.join(outDir, clean));
+    return stat.isFile() ? clean : withIndex;
+  }
+  return null;
+}
+
 /** @type {import('node:fs').FSWatcher | null} */
 let watcher = null;
 
@@ -85,9 +106,10 @@ export async function runDev(cwd) {
       return;
     }
 
-    let filePath = path.join(outDir, urlPath === '/' ? 'index.html' : urlPath);
-    if (!path.relative(outDir, filePath).startsWith('..')) {
-      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    const resolved = resolveCleanUrl(outDir, urlPath);
+    if (resolved) {
+      const filePath = path.join(outDir, resolved);
+      if (!path.relative(outDir, filePath).startsWith('..') && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         const ext = path.extname(filePath);
         const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.json': 'application/json', '.ico': 'image/x-icon', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
         res.setHeader('Content-Type', types[ext] || 'application/octet-stream');

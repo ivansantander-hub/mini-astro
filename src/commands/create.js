@@ -101,7 +101,7 @@ export async function runCreate(projectDir, projectName, opts = {}) {
 
 function getNavHtml(cookiesStrict) {
   const policyLinks = cookiesStrict
-    ? '\n    <a href="/cookies.html">Cookies</a>\n    <a href="/privacidad.html">Privacy</a>'
+    ? '\n    <a href="/cookies">Cookies</a>\n    <a href="/privacidad">Privacy</a>'
     : '';
   return `  <nav class="site-nav" aria-label="Main">
     <a href="/">Home</a>${policyLinks}
@@ -142,7 +142,7 @@ ${nav}
 
 function getIndexPage(cookiesStrict) {
   const policyLinks = cookiesStrict
-    ? '\n  <footer class="landing-footer"><a href="/cookies.html">Cookie Policy</a> · <a href="/privacidad.html">Privacy</a></footer>'
+    ? '\n  <footer class="landing-footer"><a href="/cookies">Cookie Policy</a> · <a href="/privacidad">Privacy</a></footer>'
     : '';
   return `---
 layout: Base
@@ -171,7 +171,7 @@ function getCookieConsentBar() {
   <div class="cookie-consent-card">
     <h2 class="cookie-consent-title">We value your privacy</h2>
     <p class="cookie-consent-text">We use essential cookies to run the site. Optional cookies help us improve experience. You choose.</p>
-    <p class="cookie-consent-links"><a href="/cookies.html">Cookie Policy</a> · <a href="/privacidad.html">Privacy</a></p>
+    <p class="cookie-consent-links"><a href="/cookies">Cookie Policy</a> · <a href="/privacidad">Privacy</a></p>
     <div class="cookie-consent-actions">
       <button type="button" id="cookie-decline" class="cookie-consent-decline">Decline optional</button>
       <button type="button" id="cookie-accept" class="cookie-consent-accept">Accept all</button>

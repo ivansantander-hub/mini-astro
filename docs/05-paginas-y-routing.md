@@ -2,19 +2,21 @@
 
 mini-astro usa **file-based routing**: cada archivo HTML en `src/pages/` (y sus subcarpetas) se convierte en una ruta en el sitio.
 
-## Reglas de rutas y salida del build
+## Reglas de rutas y salida del build (URLs limpias)
 
-El build escribe en `outDir` (por defecto `dist/`) **la misma ruta relativa** que el archivo tiene en `src/pages/`:
+El build genera **URLs limpias** sin `.html` en la barra del navegador:
 
-| Origen | Salida en dist | URL servida (por defecto) |
-|--------|----------------|---------------------------|
-| `src/pages/index.html` | `dist/index.html` | `/` (resuelta por el servidor como índice) |
-| `src/pages/foo.html` | `dist/foo.html` | `/foo.html` |
-| `src/pages/blog/post.html` | `dist/blog/post.html` | `/blog/post.html` |
+| Origen | Salida en dist | URL |
+|--------|----------------|-----|
+| `src/pages/index.html` | `dist/index.html` | `/` |
+| `src/pages/cookies.html` | `dist/cookies/index.html` | `/cookies` o `/cookies/` |
+| `src/pages/blog/post.html` | `dist/blog/post/index.html` | `/blog/post` o `/blog/post/` |
 
-No hay rutas dinámicas (`[slug].html`) ni reescritura de extensiones en el build. La URL coincide con la ruta relativa del archivo; por tanto, las URLs incluyen `.html` salvo la raíz.
+Cada página que no sea la raíz se escribe como **`<ruta>/index.html`** (resolución de índice de directorio). Así puedes navegar a `/cookies` en lugar de `/cookies.html`. El dev server y la mayoría de hosts estáticos (Nginx, Apache, Netlify, Vercel) sirven esa URL correctamente.
 
-Para entender **por qué** algunas URLs pueden verse “limpias” (sin `.html`) y cómo conseguirlo con reglas del servidor, ver [URLs limpias y resolución en el servidor](05b-urls-limpias.md).
+No hay rutas dinámicas (`[slug].html`). Los enlaces generados en el scaffold apuntan a rutas limpias (p. ej. `/cookies`, `/privacidad`).
+
+Para el concepto detrás (directory index, servidor), ver [URLs limpias y resolución en el servidor](05b-urls-limpias.md).
 
 ## Estructura de una página
 
