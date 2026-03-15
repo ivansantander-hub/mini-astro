@@ -66,7 +66,8 @@ export async function runBuild(cwd) {
     fs.writeFileSync(outPath, html, 'utf8');
   }
 
-  console.log(`Built ${pageFiles.length} page(s) to ${outDir}`);
+  const outRelative = path.relative(process.cwd(), outDir).replace(/\\/g, '/') || '.';
+  console.log(`  \x1b[90m${pageFiles.length} page(s)\x1b[0m → \x1b[36m${outRelative}\x1b[0m`);
 }
 
 function copyDir(src, dest) {

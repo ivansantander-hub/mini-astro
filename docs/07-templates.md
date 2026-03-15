@@ -6,6 +6,7 @@ Los **templates** son layouts que definen la estructura común de las páginas (
 
 - Directorio: `src/templates/` (relativo al `srcDir`).
 - Cada archivo es un layout: `Base.html`, `Blog.html`, etc. La página elige el layout con el frontmatter `layout: Base`.
+- El scaffold genera un **Base** con navbar (Home y, si aplica, Cookies y Privacy) para poder volver al inicio desde cualquier página.
 
 ## Slot
 

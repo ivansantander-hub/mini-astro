@@ -16,10 +16,8 @@ El comando **`mini-astro dev`** inicia un servidor de desarrollo que sirve el si
    - Cualquier otra ruta se resuelve a un archivo bajo `dist/` (sin salir del directorio por seguridad). Se usan tipos MIME habituales (HTML, CSS, JS, imágenes, etc.).
 
 4. **Live reload**  
-   - Ruta especial **`/__mini_astro_live`**: responde con `Content-Type: text/event-stream` y mantiene la conexión (Server-Sent Events). Cada cliente que se conecte recibe un evento `reload` cuando hay un cambio.
-   - En cada respuesta **HTML** se inyecta antes de `</body>` un script que:
-     - Abre `EventSource('/__mini_astro_live')`.
-     - Al recibir un mensaje, cierra la conexión y ejecuta `location.reload()`.
+   - Ruta **`/__mini_astro_live`**: Server-Sent Events; el cliente recibe un evento `reload` cuando hay un cambio.
+   - Ruta **`/__mini_astro_reload.js`**: script externo que abre `EventSource('/__mini_astro_live')` y recarga la página al recibir el evento. En cada respuesta HTML se inyecta `<script src="/__mini_astro_reload.js"></script>` (sin script inline), para no violar CSP `script-src 'self'`.
 
 Si **chokidar** no está instalado, el servidor sigue funcionando pero no hay watch ni eventos de reload; tendrás que hacer build manual y recargar el navegador a mano.
 

@@ -30,8 +30,10 @@ No hay bundling de JS/CSS: el build solo resuelve HTML (frontmatter, layouts, in
 | Frontmatter | YAML entre `---` al inicio de cada página (layout, title, etc.). |
 | Componentes | `<mini-include src="Nombre" />` con props opcionales. |
 | Templates | Layouts con `<slot />` y variables `{{ title }}`, `{{ site.key }}`. |
+| Landing por defecto | Página de inicio “Hello humans” con tema moderno (Syne, DM Sans, oscuro) y `public/css/theme.css`. |
+| Package manager | En `init` eliges **pnpm** (por defecto), **yarn** o **npm**; el proyecto queda configurado para el elegido. |
 | Datos globales | Archivos en `src/data/*.json` expuestos como `site` en el contexto. |
-| Cookies / CSP | Banner de consentimiento y CSP inyectables; configurables. |
+| Cookies / CSP | Barra de consentimiento (Accept claro) y páginas de políticas; configurables. |
 | Dev server | Servidor HTTP sobre `dist/`, watch en `src/` y live reload (con chokidar). |
 
 ## Limitaciones (v1)

@@ -14,25 +14,32 @@ Mini static site framework with **security-first defaults** and **Atomic Design*
 - **File-based routing**: `src/pages/index.html` → `/`, `about.html` → `/about`
 - **Components**: `<mini-include src="Header" />` with optional props (`title1="..."`)
 - **Layouts**: `templates/Base.html` with `<slot />` and `{{ title }}`
+- **Default landing**: “Hello humans” hero with modern theme (Syne + DM Sans, dark UI). Cookie consent bar and policy pages when enabled.
+- **Package manager**: Choose **pnpm** (default), **yarn**, or **npm** at project creation.
 - **Security defaults**: Cookie consent banner (optional), CSP, policy pages (configurable)
 - **Fast build** and **dev server** with optional live reload (chokidar)
 
 ## Quick start
 
+mini-astro is not on the npm registry. Use it from GitHub:
+
 ```bash
-npx mini-astro init
-# or
-npx mini-astro create my-site
+npx github:ivansantander-hub/mini-astro init
+# or create directly
+npx github:ivansantander-hub/mini-astro create my-site
 cd my-site
-npm run dev
+pnpm install    # or yarn / npm install (you choose at init)
+pnpm dev
 ```
+
+**Interactive init** asks for: project name, cookie banner, policy pages, CSP, and **package manager** (pnpm / yarn / npm). Default is **pnpm**. The new project includes a “Hello humans” landing and, if enabled, a cookie consent bar with a clear **Accept** action and links to Cookie and Privacy pages.
 
 ## Commands
 
 | Command | Description |
 |--------|-------------|
-| `mini-astro init` | Interactive: project name, cookies, policies, CSP |
-| `mini-astro create [name]` | New project with optional name |
+| `mini-astro init` | Interactive: project name, cookies, policies, CSP, package manager (pnpm/yarn/npm) |
+| `mini-astro create [name]` | New project with optional name (default: pnpm) |
 | `mini-astro build` | Build to `dist/` |
 | `mini-astro dev` | Dev server (port 3000) + watch + live reload |
 | `mini-astro route <name>` | Add page `src/pages/<name>.html` |

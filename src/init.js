@@ -1,5 +1,4 @@
 import path from 'node:path';
-import fs from 'node:fs';
 import readline from 'node:readline';
 import { runCreate } from './commands/create.js';
 
@@ -20,6 +19,8 @@ export async function runInit(cwd, projectName) {
   const cookiesStrict = (await ask('Strict cookie consent banner? [Y/n]', 'Y')).toLowerCase() !== 'n';
   const policyPages = (await ask('Generate Cookies and Privacy pages? [Y/n]', 'Y')).toLowerCase() !== 'n';
   const csp = (await ask('Inject strict CSP by default? [Y/n]', 'Y')).toLowerCase() !== 'n';
+  const pmAnswer = (await ask('Package manager: pnpm / yarn / npm', 'pnpm')).trim().toLowerCase();
+  const packageManager = ['pnpm', 'yarn', 'npm'].includes(pmAnswer) ? pmAnswer : 'pnpm';
 
   rl.close();
 
@@ -27,9 +28,9 @@ export async function runInit(cwd, projectName) {
     cookiesStrict,
     policyPages,
     csp,
+    packageManager,
   };
 
   const projectDir = path.resolve(cwd, name);
   await runCreate(projectDir, name, opts);
-  console.log(`\nDone. Run:\n  cd ${name}\n  npx mini-astro dev`);
 }

@@ -14,17 +14,21 @@ El CLI de mini-astro se ejecuta con **`npx mini-astro`** o **`mini-astro`** si e
 ### `init [nombre]`
 
 - **Uso**: `mini-astro init` o `mini-astro init mi-sitio`
-- **Descripción**: Inicialización interactiva. Pregunta por nombre del proyecto, banner de cookies estricto, generación de páginas de políticas (Cookies/Privacidad) e inyección de CSP. Con las respuestas llama a la misma lógica que **create** y genera el proyecto en `<cwd>/<nombre>`.
-- Si pasas un nombre como argumento posicional, se usa como nombre del proyecto y no se pregunta por él.
-- Al terminar sugiere: `cd <nombre>` y `npx mini-astro dev`.
+- **Descripción**: Inicialización interactiva. Pregunta por:
+  - Nombre del proyecto (o usa el argumento si lo pasas)
+  - Banner de cookies estricto (Sí/No)
+  - Generación de páginas de políticas (Cookies y Privacidad)
+  - CSP estricta por defecto
+  - **Package manager**: **pnpm** (por defecto), **yarn** o **npm**
+- Con las respuestas llama a **create** y genera el proyecto. Al terminar imprime los comandos para instalar y arrancar (p. ej. `cd <nombre>`, `pnpm install`, `pnpm dev`).
 
 ### `create [nombre]`
 
 - **Uso**: `mini-astro create` o `mini-astro create mi-sitio`
 - **Descripción**:  
-  - **Con nombre** (`create mi-sitio`): Crea el proyecto en `<cwd>/mi-sitio` sin preguntas, con opciones por defecto (cookies estrictas, policy pages, CSP).  
-  - **Sin nombre** (`create`): Lanza el flujo **interactivo** igual que **init** (preguntas de nombre, cookies, políticas, CSP).
-- Crea carpetas (src/atoms, molecules, organisms, templates, pages, data; public/css, js, img), Base.html, index.html, opcionalmente CookieConsentBar, cookies.html, privacidad.html, site.json, mini-astro.config.js, package.json. Si el directorio ya existe, lanza error.
+  - **Con nombre** (`create mi-sitio`): Crea el proyecto en `<cwd>/mi-sitio` sin preguntas. Usa opciones por defecto (cookies, policy pages, CSP) y **pnpm** como package manager.  
+  - **Sin nombre** (`create`): Lanza el flujo **interactivo** igual que **init** (nombre, cookies, políticas, CSP, package manager).
+- Genera: carpetas Atomic Design + public/css (incl. `theme.css`), Base.html, landing **“Hello humans”** en index.html, CookieConsentBar y páginas de políticas si aplica, site.json, config, package.json (con `packageManager: "pnpm@9.0.0"` si es pnpm). Si el directorio ya existe, lanza error.
 
 ### `new [nombre]`
 

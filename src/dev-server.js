@@ -16,6 +16,23 @@ export async function runDev(cwd) {
   const outDir = path.resolve(cwd, config.outDir);
   const srcDir = path.resolve(cwd, config.srcDir);
 
+  const c = {
+    reset: '\x1b[0m',
+    dim: '\x1b[2m',
+    bold: '\x1b[1m',
+    cyan: '\x1b[36m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    silver: '\x1b[90m',
+    magenta: '\x1b[35m',
+  };
+  console.log('');
+  console.log(c.cyan + '    ___     ');
+  console.log(c.cyan + '   /   \\   ');
+  console.log(c.cyan + '  | o o |  ' + c.reset + c.dim + '  Bite my shiny metal...');
+  console.log(c.cyan + '  |  ^  |  ' + c.reset);
+  console.log(c.cyan + '   \\___/   ' + c.reset);
+  console.log('');
   await runBuild(cwd);
 
   try {
@@ -29,16 +46,26 @@ export async function runDev(cwd) {
     console.log('Tip: npm install chokidar for watch/live reload');
   }
 
-  const port = 3000;
+  const liveReloadScript = "(function(){var e=new EventSource('/__mini_astro_live');e.onmessage=function(){e.close();location.reload();};})();";
+
+  const port = 2323;
   const server = http.createServer((req, res) => {
-    if (req.url === '/__mini_astro_live') {
+    const urlPath = req.url?.split('?')[0] || '/';
+
+    if (urlPath === '/__mini_astro_live') {
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
       clients.push(res);
       req.on('close', () => { const i = clients.indexOf(res); if (i !== -1) clients.splice(i, 1); });
       return;
     }
 
-    let filePath = path.join(outDir, req.url === '/' ? 'index.html' : req.url.split('?')[0]);
+    if (urlPath === '/__mini_astro_reload.js') {
+      res.writeHead(200, { 'Content-Type': 'application/javascript', 'Cache-Control': 'no-store' });
+      res.end(liveReloadScript);
+      return;
+    }
+
+    let filePath = path.join(outDir, urlPath === '/' ? 'index.html' : urlPath);
     if (!path.relative(outDir, filePath).startsWith('..')) {
       if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         const ext = path.extname(filePath);
@@ -46,9 +73,10 @@ export async function runDev(cwd) {
         res.setHeader('Content-Type', types[ext] || 'application/octet-stream');
         let data = fs.readFileSync(filePath);
         if (ext === '.html') {
-          const html = data.toString('utf8');
-          const injected = html.replace('</body>', '<script>(function(){var e=new EventSource("/__mini_astro_live");e.onmessage=function(){e.close();location.reload();};})();</script></body>');
-          data = Buffer.from(injected, 'utf8');
+          let html = data.toString('utf8');
+          html = html.replace(/<script>\(function\(\)\{[^<]*EventSource[^<]*__mini_astro_live[^<]*<\/script>\s*/g, '');
+          html = html.replace('</body>', '<script src="/__mini_astro_reload.js"></script></body>');
+          data = Buffer.from(html, 'utf8');
         }
         res.end(data);
         return;
@@ -64,10 +92,14 @@ export async function runDev(cwd) {
     clients.forEach((r) => { try { r.write('data: reload\n\n'); } catch {} });
   }
 
-  const injectScript = `<script>(function(){var e=new EventSource('/__mini_astro_live');e.onmessage=function(){e.close();location.reload();};})();</script></body>`;
-  // Note: injecting into every HTML response would require streaming replace. For simplicity we don't inject; client can reload manually or we inject in build. For live reload we inject a script in the built HTML during dev. So we need to either (1) inject when serving HTML in dev, or (2) build with a dev flag that adds the script. Option (2): in runBuild we could accept opts.dev and append the script to every HTML. So runBuild(cwd, { dev: true }) and then in build we append injectScript before </body>. Let me do that.
   server.listen(port, () => {
-    console.log(`Dev server at http://localhost:${port}`);
-    console.log('Watching', srcDir);
+    const relSrc = path.relative(cwd, srcDir).replace(/\\/g, '/') || 'src';
+    console.log(c.green + '  ◆\x1b[0m ' + c.bold + 'Local\x1b[0m   ' + c.cyan + 'http://localhost:' + port + c.reset);
+    console.log(c.silver + '  ◆\x1b[0m Watch    ' + c.reset + relSrc);
+    console.log('');
+    console.log(c.dim + '  Ready. Edit and save to reload.\x1b[0m');
+    console.log('');
+    console.log('  ' + c.bold + c.magenta + 'mini astro' + c.reset);
+    console.log('');
   });
 }

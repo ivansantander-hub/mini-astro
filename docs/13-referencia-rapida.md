@@ -28,15 +28,19 @@ src/
 
 ## Comandos frecuentes
 
+Desde GitHub (no está en npm):
+
 ```bash
-npx mini-astro init
-npx mini-astro create mi-sitio
-npx mini-astro build
-npx mini-astro dev
-npx mini-astro route blog/entrada
-npx mini-astro component Card
-npx mini-astro component Header organisms
+npx github:ivansantander-hub/mini-astro init
+npx github:ivansantander-hub/mini-astro create mi-sitio
+npx github:ivansantander-hub/mini-astro build
+npx github:ivansantander-hub/mini-astro dev
+npx github:ivansantander-hub/mini-astro route blog/entrada
+npx github:ivansantander-hub/mini-astro component Card
+npx github:ivansantander-hub/mini-astro component Header organisms
 ```
+
+Tras crear el proyecto: `pnpm install` (o yarn/npm) y `pnpm dev`. Por defecto se usa **pnpm**; en `init` puedes elegir yarn o npm.
 
 ## Limitaciones
 

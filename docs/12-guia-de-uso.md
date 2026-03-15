@@ -5,55 +5,72 @@ Flujo completo para crear un sitio con mini-astro, editarlo y generar el build.
 ## Requisitos
 
 - Node.js ≥ 18
-- npm o similar
+- **pnpm** (recomendado), **yarn** o **npm**
 
 ## 1. Crear el proyecto
 
+mini-astro no está en el registry de npm. Úsalo desde GitHub:
+
+```bash
+npx github:ivansantander-hub/mini-astro init
+```
+
 **Opción A — Interactivo (recomendado la primera vez)**
 
+Al ejecutar `init` se pregunta:
+
+- **Nombre del proyecto**
+- **Banner de cookies estricto** (Sí/No): si activas, se genera la barra de consentimiento y el usuario solo tiene que pulsar **Accept**; se incluyen enlaces a Cookie Policy y Privacidad.
+- **Páginas de políticas** (Cookies y Privacidad): Sí/No
+- **CSP estricta por defecto**: Sí/No
+- **Package manager**: **pnpm** (por defecto), **yarn** o **npm**. El proyecto se crea con los scripts listos para el gestor elegido.
+
+El proyecto se crea en una subcarpeta. Al final se muestran los comandos para instalar dependencias y arrancar el servidor de desarrollo (por ejemplo `pnpm install` y `pnpm dev`).
+
+**Opción B — Directo (sin preguntas)**
+
 ```bash
-npx mini-astro init
-```
-
-Responder a las preguntas (nombre, cookies, políticas, CSP). El proyecto se crea en una subcarpeta con el nombre indicado.
-
-**Opción B — Directo**
-
-```bash
-npx mini-astro create mi-sitio
+npx github:ivansantander-hub/mini-astro create mi-sitio
 cd mi-sitio
+pnpm install
+pnpm dev
 ```
 
-Esto crea la estructura con opciones por defecto (cookies estrictas, CSP, páginas de políticas).
+Se usa **pnpm** por defecto. Cookies, políticas y CSP quedan activos.
 
 ## 2. Estructura generada
 
 ```
 mi-sitio/
   mini-astro.config.js
-  package.json
+  package.json          (con packageManager: "pnpm@9.0.0" si elegiste pnpm)
   public/
-    css/ js/ img/
+    css/
+      theme.css         (tema por defecto: landing + modal de cookies)
+    js/
+      consent.js        (lógica del modal; solo si cookies strict)
+    img/
   src/
     atoms/
-    molecules/     (CookieConsentBar.html si cookies strict)
+    molecules/          (CookieConsentBar.html si cookies strict)
     organisms/
     templates/
-      Base.html
+      Base.html        (layout con navbar: Home, Cookies, Privacy)
     pages/
-      index.html
+      index.html        (landing "Hello humans")
       cookies.html
       privacidad.html   (si policy pages)
     data/
       site.json
 ```
 
+La página de inicio es una **landing moderna** (“Hello humans”) con tipografía Syne + DM Sans y tema oscuro. Si activaste cookies, un **modal de consentimiento** (Accept all / Decline optional) aparece al cargar; la lógica está en `public/js/consent.js` (compatible con CSP estricta). Ver `COOKIE_CONSENT.md` para usar la elección en tu app.
+
 ## 3. Desarrollo local
 
 ```bash
-npm run dev
-# o
-npx mini-astro dev
+pnpm dev
+# o yarn dev / npm run dev según lo elegido al crear
 ```
 
 - Abre **http://localhost:3000**.
@@ -117,9 +134,8 @@ En templates o páginas:
 ## 7. Build para producción
 
 ```bash
-npm run build
-# o
-npx mini-astro build
+pnpm build
+# o yarn build / npm run build
 ```
 
 La salida queda en **`dist/`** (o el `outDir` de tu config). Ahí tendrás todo el HTML generado y una copia de `public/` (css, js, img).
