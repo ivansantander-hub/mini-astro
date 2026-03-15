@@ -1,50 +1,59 @@
 # Atomic Design
 
-mini-astro organiza los componentes en capas inspiradas en **Atomic Design**: atoms → molecules → organisms. Los **templates** y las **pages** completan la jerarquía.
+mini-astro organiza el proyecto siguiendo **Atomic Design** de forma estricta: **quarks → atoms → molecules → organisms → templates → pages**. Esta es la base de cómo trabajar en el proyecto.
+
+## Jerarquía (de abajo hacia arriba)
+
+| Nivel | Carpeta | Uso | CLI |
+|-------|---------|-----|-----|
+| **0. Quarks** | `src/quarks/` | Design tokens (colores, espaciado, tipografía). No son componentes UI. | `mini-astro quarks` (ver ruta) |
+| **1. Atoms** | `src/atoms/` | Bloques mínimos: botones, inputs, iconos, etiquetas. | `mini-astro component <name> atom` |
+| **2. Molecules** | `src/molecules/` | Agrupaciones de atoms: cards, formularios simples, CookieConsentBar. | `mini-astro component <name> molecule` |
+| **3. Organisms** | `src/organisms/` | Secciones de página: header, footer, listas, galerías. | `mini-astro component <name> organism` |
+| **4. Templates** | `src/templates/` | Layouts con `<slot />`; sin contenido final. | `mini-astro template <name>` |
+| **5. Pages** | `src/pages/` | Páginas finales (file-based routing). | `mini-astro route <name>` |
+
+Regla de composición: cada nivel solo usa niveles inferiores. Atoms usan quarks (tokens); molecules usan atoms; organisms usan molecules y atoms; templates usan organisms; pages usan templates y componentes.
 
 ## Estructura de carpetas
 
 Dentro de `src/` (o el `srcDir` configurado):
 
-| Carpeta | Uso |
-|---------|-----|
-| `atoms/` | Componentes mínimos (botones, iconos, etiquetas). |
-| `molecules/` | Agrupaciones pequeñas (CookieConsentBar, cards, formularios simples). |
-| `organisms/` | Bloques de página (header, footer, listas de proyectos). |
-| `templates/` | Layouts que definen la estructura de la página y contienen `<slot />`. |
-| `pages/` | Páginas finales (file-based routing). |
-| `data/` | JSON de datos globales (expuestos como `site`). |
+```
+src/
+  quarks/      → tokens.json, README (design tokens)
+  atoms/       → Button.html, Input.html, …
+  molecules/   → CookieConsentBar.html, Card.html, …
+  organisms/   → Header.html, Footer.html, …
+  templates/   → Base.html, Blog.html, …
+  pages/       → index.html, about.html, blog/post.html, …
+  data/        → site.json (datos globales, expuestos como site)
+```
 
-No es obligatorio usar las tres capas; puedes tener solo molecules y organisms. Lo importante es que los componentes referenciados con `<mini-include src="Nombre" />` existan en una de esas carpetas (o se indique la capa: `organisms/Header`).
+## Quarks (nivel 0)
 
-## Resolución de componentes
+- **No son componentes**: son valores (colores, espaciado, tipografía, bordes, sombras).
+- Fuente única de verdad para el diseño. En mini-astro se incluye `src/quarks/tokens.json` por defecto; tu `public/css/theme.css` puede reflejar esos tokens (variables CSS).
+- Comando: `mini-astro quarks` muestra la ruta de `quarks/` y su contenido.
 
-Cuando el build encuentra `<mini-include src="X" />`:
+## Atoms, molecules, organisms
 
-1. **Si `X` contiene `/`** (ej. `organisms/Header`):  
-   Se busca solo en esa capa. La ruta es `src/<capa>/<nombre>.html` (ej. `src/organisms/Header.html`).
+- Se referencian con `<mini-include src="Nombre" />` (o `atoms/Nombre`, `molecules/Nombre`, `organisms/Nombre`).
+- **Resolución**: si no se indica capa, se busca en orden atoms → molecules → organisms; la primera coincidencia gana.
+- **Nombres**: PascalCase, archivo `Nombre.html` (ej. `CookieConsentBar.html`).
 
-2. **Si `X` no contiene `/`**:  
-   Se busca en este orden:
-   - `src/atoms/X.html`
-   - `src/molecules/X.html`
-   - `src/organisms/X.html`
+## Templates y pages
 
-La primera coincidencia gana. El nombre del archivo debe coincidir con el `src` (case-sensitive en sistemas que lo son). Se añade `.html` automáticamente si no está en el atributo.
+- **Templates**: se eligen con `layout: Nombre` en el frontmatter de la página; el archivo es `src/templates/Nombre.html`. No se incluyen con `<mini-include>`.
+- **Pages**: cada archivo en `src/pages/` genera una ruta (URLs limpias). Ver [Páginas y routing](05-paginas-y-routing.md).
 
-El directorio base para estas rutas es el **cwd** del proyecto (donde está `mini-astro.config.js`), no la carpeta del paquete mini-astro.
+## CLI y autocomplete
 
-## Convenciones recomendadas
-
-- **Nombres**: PascalCase para componentes (ej. `CookieConsentBar`, `ProjectCard`). El nombre del archivo debe ser el mismo: `CookieConsentBar.html`.
-- **Atoms**: un solo elemento o un bloque muy pequeño, reutilizable en cualquier contexto.
-- **Molecules**: varios atoms o contenido corto; por ejemplo barras de consentimiento, cards.
-- **Organisms**: secciones completas de página (header con nav, listas de proyectos, galerías).
-
-## Relación con templates y pages
-
-- **Templates** no se incluyen con `<mini-include>`. Se eligen por el frontmatter `layout: Nombre` en la página; el archivo debe estar en `src/templates/Nombre.html`.
-- **Pages** son el punto de entrada; cada archivo en `src/pages/` (y subcarpetas) genera una ruta. Ver [Páginas y routing](05-paginas-y-routing.md).
+- Ver todos los comandos: `mini-astro help` o `mini-astro --help`.
+- Ayuda por comando: `mini-astro help component`, `mini-astro component --help`, etc.
+- Autocomplete en la terminal:
+  - Bash: `source <(mini-astro completion bash)` (o añadir a `~/.bashrc`).
+  - Zsh: `source <(mini-astro completion zsh)` (o añadir a `~/.zshrc`).
 
 ## Siguiente paso
 

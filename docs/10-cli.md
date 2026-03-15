@@ -43,19 +43,41 @@ El CLI de mini-astro se ejecuta con **`npx mini-astro`** o **`mini-astro`** si e
 ### `dev`
 
 - **Uso**: `mini-astro dev`
-- **Descripción**: Ejecuta un build y luego inicia un servidor HTTP que sirve `outDir` (por defecto `dist/`) en el puerto **3000**. Si está instalado **chokidar**, observa `srcDir` y al detectar cambios vuelve a hacer build y envía un evento de live reload a los clientes conectados a `/__mini_astro_live`. En cada respuesta HTML se inyecta un script que abre ese SSE y recarga la página al recibir el evento.
+- **Descripción**: Ejecuta un build y luego inicia un servidor HTTP que sirve `outDir` (por defecto `dist/`) en el puerto **2323** (o `PORT`). Si está instalado **chokidar**, observa `srcDir` y al detectar cambios vuelve a hacer build y envía un evento de live reload a los clientes conectados a `/__mini_astro_live`. En cada respuesta HTML se inyecta un script que abre ese SSE y recarga la página al recibir el evento.
 - Sin chokidar, el servidor sigue funcionando pero no hay recarga automática.
 
-### `route <nombre>` / `add [page] <nombre>`
+### `route <nombre>` / `page <nombre>` / `add [page] <nombre>`
 
-- **Uso**: `mini-astro route blog/post`, `mini-astro route about`, o `mini-astro add blog/post`
-- **Descripción**: Crea un archivo de página en `src/pages/` que corresponde a la ruta indicada. Por ejemplo `route blog/post` crea `src/pages/blog/post.html` (y la carpeta `blog` si no existe). El contenido es un placeholder con frontmatter `layout: Base` y un título derivado del nombre del archivo.
-- Con **add**, si el primer argumento es `page`, se ignora (ej. `add page contacto` crea `contacto.html`). **add** es alias de **route** (añadir página).
+- **Uso**: `mini-astro route about`, `mini-astro page blog/post`, `mini-astro add page contacto`
+- **Descripción**: Crea una página en `src/pages/` (Atomic: pages). `route blog/post` crea `src/pages/blog/post.html`; la URL será `/blog/post`. Contenido: placeholder con `layout: Base` y título derivado del nombre. **page** y **add** son alias de **route**; con **add**, si el primer argumento es `page` se ignora.
+
+### `quarks`
+
+- **Uso**: `mini-astro quarks`
+- **Descripción**: Muestra la ruta de **quarks** (design tokens) y lista los archivos en `src/quarks/`. Nivel 0 de Atomic Design; no son componentes UI.
 
 ### `component <nombre> [capa]`
 
-- **Uso**: `mini-astro component Card` o `mini-astro component Header organisms`
-- **Descripción**: Crea un componente nuevo en la capa indicada (por defecto **molecules**). Opciones de capa: **atoms**, **molecules**, **organisms**. El archivo se crea como `src/<capa>/<nombre>.html` con un contenido mínimo (div con clase y comentario).
+- **Uso**: `mini-astro component Button atom`, `mini-astro component Card molecule`, `mini-astro component Header organism`
+- **Descripción**: Crea un componente en la capa indicada (por defecto **molecule**). Capas: **atom** | **molecule** | **organism** (o en plural: atoms, molecules, organisms). Crea `src/<capa>/<nombre>.html`.
+
+### `template <nombre>`
+
+- **Uso**: `mini-astro template Blog`
+- **Descripción**: Crea un layout en `src/templates/<nombre>.html` con estructura mínima (html, head, body, `<slot />`). Las páginas lo usan con `layout: Nombre` en el frontmatter.
+
+
+### `completion [bash|zsh]`
+
+- **Uso**: `mini-astro completion bash` o `mini-astro completion zsh`
+- **Descripción**: Escribe en stdout el script de autocompletado para la shell. Instalación:
+  - **Bash**: `source <(mini-astro completion bash)` (o añadir a `~/.bashrc`).
+  - **Zsh**: `source <(mini-astro completion zsh)` (o añadir a `~/.zshrc`).
+
+### `help [comando]`
+
+- **Uso**: `mini-astro help`, `mini-astro help component`, `mini-astro component --help`
+- **Descripción**: Muestra la ayuda general o la ayuda del comando indicado.
 
 ## Ejemplos
 

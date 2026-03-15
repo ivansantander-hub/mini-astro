@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
 import path from 'node:path';
+import fs from 'node:fs';
 import { parseArgs } from 'node:util';
 import { runInit } from './src/init.js';
 import { runBuild } from './src/build.js';
 import { runDev } from './src/dev-server.js';
 import { runRoute } from './src/commands/route.js';
 import { runComponent } from './src/commands/component.js';
+import { runTemplate } from './src/commands/template.js';
 import { runCreate } from './src/commands/create.js';
+import { MAIN_HELP, COMMAND_HELP } from './src/help.js';
+import { runCompletion } from './src/completion.js';
 
 const { values, positionals } = parseArgs({
   options: {
@@ -19,25 +23,51 @@ const { values, positionals } = parseArgs({
 
 const [cmd, ...rest] = positionals || [];
 
+function showHelp(subcommand) {
+  if (subcommand && COMMAND_HELP[subcommand]) {
+    console.log(COMMAND_HELP[subcommand]);
+    return;
+  }
+  console.log(MAIN_HELP);
+}
+
 async function main() {
-  if (values.help || !cmd) {
-    console.log(`
-mini-astro - Static site framework (security-first, Atomic Design)
+  const wantHelp = values.help || rest.includes('--help') || rest.includes('-h');
+  const helpTarget = rest.find((x) => x !== '--help' && x !== '-h');
 
-Usage:
-  mini-astro init              Create a new project (interactive)
-  mini-astro create [name]     Create project with optional name
-  mini-astro build             Build static site
-  mini-astro dev               Start dev server with live reload
-  mini-astro route <name>      Add a new page
-  mini-astro component <name> [atoms|molecules|organisms]  Add component
-  mini-astro new [name]         Alias for create
+  if (cmd === 'help') {
+    showHelp(helpTarget || rest[0]);
+    process.exit(0);
+  }
 
-Options:
-  -C, --cwd <dir>   Run in directory
-  -h, --help        Show this help
-`);
+  if (wantHelp || !cmd) {
+    showHelp(wantHelp ? cmd : null);
     process.exit(cmd ? 0 : 1);
+  }
+
+  if (cmd === 'completion') {
+    const shell = rest[0] || 'bash';
+    process.stdout.write(runCompletion(shell));
+    process.exit(0);
+  }
+
+  if (cmd === 'quarks') {
+    const cwd = values.cwd ? path.resolve(process.cwd(), values.cwd) : process.cwd();
+    const { loadConfig } = await import('./src/loadConfig.js');
+    const config = await loadConfig(cwd);
+    const quarksDir = path.resolve(cwd, config.srcDir || 'src', 'quarks');
+    if (fs.existsSync(quarksDir)) {
+      console.log('Quarks (design tokens):', quarksDir);
+      try {
+        const files = fs.readdirSync(quarksDir);
+        files.forEach((f) => console.log('  ', f));
+      } catch {
+        console.log('  (empty)');
+      }
+    } else {
+      console.log('No quarks directory. Run mini-astro create first or add src/quarks/ manually.');
+    }
+    process.exit(0);
   }
 
   const cwd = values.cwd ? path.resolve(process.cwd(), values.cwd) : process.cwd();
@@ -62,6 +92,7 @@ Options:
         await runDev(cwd);
         break;
       case 'route':
+      case 'page':
       case 'add':
         if (cmd === 'add' && rest[0] === 'page') rest.shift();
         await runRoute(cwd, rest[0]);
@@ -69,8 +100,12 @@ Options:
       case 'component':
         await runComponent(cwd, rest[0], rest[1]);
         break;
+      case 'template':
+        await runTemplate(cwd, rest[0]);
+        break;
       default:
         console.error(`Unknown command: ${cmd}`);
+        console.log('Run mini-astro help for usage.');
         process.exit(1);
     }
   } catch (err) {

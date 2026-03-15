@@ -3,19 +3,21 @@ import fs from 'node:fs';
 import { loadConfig } from '../loadConfig.js';
 
 const LAYERS = ['atoms', 'molecules', 'organisms'];
+const LAYER_ALIASES = { atom: 'atoms', atoms: 'atoms', molecule: 'molecules', molecules: 'molecules', organism: 'organisms', organisms: 'organisms' };
 
 /**
- * Add a new component
+ * Add a new component (Atomic Design: atoms | molecules | organisms)
  * @param {string} cwd
  * @param {string} [name]
- * @param {string} [layer] - atoms | molecules | organisms
+ * @param {string} [layer] - atom | atoms | molecule | molecules | organism | organisms
  */
 export async function runComponent(cwd, name, layer = 'molecules') {
-  if (!name) throw new Error('Usage: mini-astro component <name> [atoms|molecules|organisms]');
+  if (!name) throw new Error('Usage: mini-astro component <name> [atom|molecule|organism]');
 
-  const l = layer.toLowerCase();
+  const key = layer.toLowerCase();
+  const l = LAYER_ALIASES[key] || key;
   if (!LAYERS.includes(l)) {
-    throw new Error(`Layer must be one of: ${LAYERS.join(', ')}`);
+    throw new Error(`Layer must be one of: atom, molecule, organism (or atoms, molecules, organisms)`);
   }
 
   const config = await loadConfig(cwd);

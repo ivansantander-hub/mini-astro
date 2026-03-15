@@ -23,6 +23,7 @@ export async function runCreate(projectDir, projectName, opts = {}) {
   }
 
   const dirs = [
+    path.join(projectDir, 'src', 'quarks'),
     path.join(projectDir, 'src', 'atoms'),
     path.join(projectDir, 'src', 'molecules'),
     path.join(projectDir, 'src', 'organisms'),
@@ -34,6 +35,33 @@ export async function runCreate(projectDir, projectName, opts = {}) {
     path.join(projectDir, 'public', 'img'),
   ];
   for (const d of dirs) fs.mkdirSync(d, { recursive: true });
+
+  // Quarks: design tokens (Atomic Design level 0)
+  const tokensJson = {
+    colors: {
+      bg: '#0a0a0c',
+      surface: '#141416',
+      text: '#fafafa',
+      textMuted: '#a1a1aa',
+      accent: '#22d3ee',
+      yellow: '#eab308',
+    },
+    spacing: { xs: '0.25rem', sm: '0.5rem', md: '1rem', lg: '1.5rem', xl: '2rem' },
+    typography: { fontDisplay: 'Orbitron', fontBody: 'DM Sans' },
+    radius: { sm: '8px', md: '14px', lg: '20px' },
+  };
+  fs.writeFileSync(path.join(projectDir, 'src', 'quarks', 'tokens.json'), JSON.stringify(tokensJson, null, 2), 'utf8');
+  fs.writeFileSync(
+    path.join(projectDir, 'src', 'quarks', 'README.md'),
+    `# Quarks (design tokens)
+
+Design tokens — colors, spacing, typography, radii. Single source of truth for the design language.
+
+- \`tokens.json\` — consumed by your CSS (e.g. \`public/css/theme.css\`) or build step.
+- Do not put UI components here; only token values.
+`,
+    'utf8'
+  );
 
   // Default theme (landing + cookie bar)
   fs.writeFileSync(path.join(projectDir, 'public', 'css', 'theme.css'), getThemeCss(), 'utf8');
