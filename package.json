@@ -1,0 +1,23 @@
+{
+  "name": "mini-astro",
+  "version": "0.1.0",
+  "description": "Mini static site framework with security-first defaults and Atomic Design",
+  "type": "module",
+  "main": "src/build.js",
+  "bin": {
+    "mini-astro": "cli.js"
+  },
+  "keywords": ["static-site", "ssg", "atomic-design", "cookies", "privacy"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0"
+  },
+  "files": [
+    "cli.js",
+    "src/",
+    "templates/"
+  ]
+}
