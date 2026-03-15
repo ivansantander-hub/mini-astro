@@ -19,6 +19,7 @@ Usage:
   mini-astro template <name>         Add template (layout)
   mini-astro route <name>            Add page (file-based routing)
   mini-astro page <name>             Alias for route
+  mini-astro add [type]              Interactive: atom|molecule|organism|template|page
 
   mini-astro completion [bash|zsh]   Print shell completion script
   mini-astro help [command]          Help for a command
@@ -34,6 +35,8 @@ Examples:
   mini-astro template Blog
   mini-astro route about
   mini-astro route blog/post
+  mini-astro add                  # interactive: asks type then name
+  mini-astro add atom             # interactive: asks component name
 `.trim();
 
 export const COMMAND_HELP = {
@@ -55,7 +58,7 @@ mini-astro build — Build static site to dist/
   dev: `
 mini-astro dev — Dev server + optional live reload
 
-  Port: 2323 (or PORT env). Host: 0.0.0.0 (Local + Network). Needs chokidar for watch.
+  Port: 2323 by default (set in mini-astro.config.js dev.port at create, or PORT env). Host: 0.0.0.0. Needs chokidar for watch.
 `.trim(),
   quarks: `
 mini-astro quarks — Design tokens (Atomic level 0)
@@ -85,6 +88,12 @@ mini-astro route <name> — Add page (Atomic: pages, file-based routing)
   URL will be /about, /blog/post (clean URLs).
 `.trim(),
   page: 'Same as route. mini-astro page <name>',
+  add: `
+mini-astro add [type] — Interactive: create any Atomic level
+
+  type   Optional. atom | molecule | organism | template | page
+  If omitted, asks what to create. Then asks name (and layer for components, layout for pages).
+`.trim(),
   completion: `
 mini-astro completion [bash|zsh] — Shell autocomplete
 

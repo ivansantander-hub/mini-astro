@@ -9,6 +9,7 @@ import { runDev } from './src/dev-server.js';
 import { runRoute } from './src/commands/route.js';
 import { runComponent } from './src/commands/component.js';
 import { runTemplate } from './src/commands/template.js';
+import { runAdd } from './src/commands/add.js';
 import { runCreate } from './src/commands/create.js';
 import { MAIN_HELP, COMMAND_HELP } from './src/help.js';
 import { runCompletion } from './src/completion.js';
@@ -102,6 +103,9 @@ async function main() {
         break;
       case 'template':
         await runTemplate(cwd, rest[0]);
+        break;
+      case 'add':
+        await runAdd(cwd, rest);
         break;
       default:
         console.error(`Unknown command: ${cmd}`);

@@ -14,6 +14,7 @@ export const COMMANDS = [
   'template',
   'route',
   'page',
+  'add',
   'completion',
   'help',
 ];
@@ -43,6 +44,9 @@ _mini_astro() {
       ;;
     template|route|page|create|new)
       [ "$COMP_CWORD" -eq 2 ] && COMPREPLY=($(compgen -f -- "$cur"))
+      ;;
+    add)
+      [ "$COMP_CWORD" -eq 2 ] && COMPREPLY=($(compgen -W "atom molecule organism template page" -- "$cur"))
       ;;
     completion)
       [ "$COMP_CWORD" -eq 2 ] && COMPREPLY=($(compgen -W "bash zsh" -- "$cur"))
@@ -77,6 +81,9 @@ _mini_astro() {
           ;;
         template|route|page|create|new)
           _arguments '2:name:'
+          ;;
+        add)
+          _arguments '2:type:(atom molecule organism template page)'
           ;;
         completion)
           _arguments '2:shell:(bash zsh)'

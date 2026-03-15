@@ -88,7 +88,10 @@ export async function runDev(cwd) {
 
   const liveReloadScript = "(function(){var e=new EventSource('/__mini_astro_live');e.onmessage=function(){e.close();location.reload();};})();";
 
-  const port = Number.parseInt(process.env.PORT || '2323', 10) || 2323;
+  const port = Number.parseInt(
+    String(process.env.PORT || config.dev?.port ?? 2323),
+    10
+  ) || 2323;
   const host = '0.0.0.0';
   const server = http.createServer((req, res) => {
     const urlPath = req.url?.split('?')[0] || '/';

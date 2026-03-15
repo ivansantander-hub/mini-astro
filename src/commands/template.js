@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { loadConfig } from '../loadConfig.js';
+import { ask } from '../prompt.js';
 
 /**
  * Add a new template (Atomic Design: templates level)
@@ -8,7 +9,12 @@ import { loadConfig } from '../loadConfig.js';
  * @param {string} [name]
  */
 export async function runTemplate(cwd, name) {
-  if (!name) throw new Error('Usage: mini-astro template <name>');
+  if (process.stdin.isTTY && !name) {
+    name = await ask('Template name (e.g. Base, Blog)', '');
+    if (!name) throw new Error('Name is required.');
+  } else if (!name) {
+    throw new Error('Usage: mini-astro template <name>');
+  }
 
   const config = await loadConfig(cwd);
   const srcDir = path.resolve(cwd, config.srcDir);

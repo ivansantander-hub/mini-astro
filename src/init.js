@@ -19,6 +19,8 @@ export async function runInit(cwd, projectName) {
   const cookiesStrict = (await ask('Strict cookie consent banner? [Y/n]', 'Y')).toLowerCase() !== 'n';
   const policyPages = (await ask('Generate Cookies and Privacy pages? [Y/n]', 'Y')).toLowerCase() !== 'n';
   const csp = (await ask('Inject strict CSP by default? [Y/n]', 'Y')).toLowerCase() !== 'n';
+  const portAnswer = (await ask('Dev server port (default 2323)', '2323')).trim();
+  const devPort = portAnswer ? Number(portAnswer) || 2323 : 2323;
   const pmAnswer = (await ask('Package manager: pnpm / yarn / npm', 'pnpm')).trim().toLowerCase();
   const packageManager = ['pnpm', 'yarn', 'npm'].includes(pmAnswer) ? pmAnswer : 'pnpm';
 
@@ -29,6 +31,7 @@ export async function runInit(cwd, projectName) {
     policyPages,
     csp,
     packageManager,
+    devPort,
   };
 
   const projectDir = path.resolve(cwd, name);

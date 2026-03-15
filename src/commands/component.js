@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { loadConfig } from '../loadConfig.js';
+import { ask, choose } from '../prompt.js';
 
 const LAYERS = ['atoms', 'molecules', 'organisms'];
 const LAYER_ALIASES = { atom: 'atoms', atoms: 'atoms', molecule: 'molecules', molecules: 'molecules', organism: 'organisms', organisms: 'organisms' };
@@ -12,9 +13,17 @@ const LAYER_ALIASES = { atom: 'atoms', atoms: 'atoms', molecule: 'molecules', mo
  * @param {string} [layer] - atom | atoms | molecule | molecules | organism | organisms
  */
 export async function runComponent(cwd, name, layer = 'molecules') {
-  if (!name) throw new Error('Usage: mini-astro component <name> [atom|molecule|organism]');
+  if (process.stdin.isTTY && !name) {
+    name = await ask('Component name (PascalCase)', '');
+    if (!name) throw new Error('Name is required.');
+    if (!layer || !LAYERS.includes(LAYER_ALIASES[layer?.toLowerCase()] || layer?.toLowerCase())) {
+      layer = await choose('Layer', ['atom', 'molecule', 'organism'], 'molecule');
+    }
+  } else if (!name) {
+    throw new Error('Usage: mini-astro component <name> [atom|molecule|organism]');
+  }
 
-  const key = layer.toLowerCase();
+  const key = (layer || 'molecule').toLowerCase();
   const l = LAYER_ALIASES[key] || key;
   if (!LAYERS.includes(l)) {
     throw new Error(`Layer must be one of: atom, molecule, organism (or atoms, molecules, organisms)`);

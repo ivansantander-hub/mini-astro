@@ -66,7 +66,12 @@ Design tokens — colors, spacing, typography, radii. Single source of truth for
   // Default theme (landing + cookie bar)
   fs.writeFileSync(path.join(projectDir, 'public', 'css', 'theme.css'), getThemeCss(), 'utf8');
 
-  // Base template
+  // Atom: NavLink (Atomic Design level 1)
+  fs.writeFileSync(path.join(projectDir, 'src', 'atoms', 'NavLink.html'), getNavLinkAtom(), 'utf8');
+  // Organism: SiteHeader (Atomic Design level 3), uses NavLink
+  fs.writeFileSync(path.join(projectDir, 'src', 'organisms', 'SiteHeader.html'), getSiteHeaderOrganism(cookiesStrict), 'utf8');
+
+  // Base template (uses organism SiteHeader)
   const baseTemplate = getBaseTemplate(cookiesStrict, csp);
   fs.writeFileSync(path.join(projectDir, 'src', 'templates', 'Base.html'), baseTemplate, 'utf8');
 
@@ -100,11 +105,13 @@ Design tokens — colors, spacing, typography, radii. Single source of truth for
   };
   fs.writeFileSync(path.join(projectDir, 'src', 'data', 'site.json'), JSON.stringify(siteJson, null, 2), 'utf8');
 
+  const devPort = opts.devPort != null ? Number(opts.devPort) : 2323;
   const config = `export default {
   srcDir: 'src',
   outDir: 'dist',
   dataDir: 'src/data',
   atomicDesign: true,
+  dev: { port: ${devPort} },
   cookies: { strict: ${cookiesStrict} },
   security: { csp: ${csp}, policyPages: ${policyPages} },
 };
@@ -128,16 +135,27 @@ Design tokens — colors, spacing, typography, radii. Single source of truth for
 
   const installCmd = packageManager === 'pnpm' ? 'pnpm install' : packageManager === 'yarn' ? 'yarn' : 'npm install';
   const devCmd = packageManager === 'pnpm' ? 'pnpm dev' : packageManager === 'yarn' ? 'yarn dev' : 'npm run dev';
-  console.log(`\nCreated with ${packageManager}. Run:\n  cd ${path.basename(projectDir)}\n  ${installCmd}\n  ${devCmd}`);
+  console.log(`\nCreated with ${packageManager}. Dev server port: ${devPort}`);
+  console.log(`Run:\n  cd ${path.basename(projectDir)}\n  ${installCmd}\n  ${devCmd}`);
 }
 
-function getNavHtml(cookiesStrict) {
-  const policyLinks = cookiesStrict
-    ? '\n    <a href="/cookies">Cookies</a>\n    <a href="/privacidad">Privacy</a>'
-    : '';
-  return `  <nav class="site-nav" aria-label="Main">
-    <a href="/">Home</a>${policyLinks}
-  </nav>`;
+/** Atom: single nav link (Atomic Design level 1). Props: href, label */
+function getNavLinkAtom() {
+  return '<a href="{{ href }}" class="site-nav-link">{{ label }}</a>';
+}
+
+/** Organism: site header with nav (Atomic Design level 3). Uses atoms/NavLink */
+function getSiteHeaderOrganism(cookiesStrict) {
+  const links = [
+    '<mini-include src="atoms/NavLink" href="/" label="Home" />',
+  ];
+  if (cookiesStrict) {
+    links.push('<mini-include src="atoms/NavLink" href="/cookies" label="Cookies" />');
+    links.push('<mini-include src="atoms/NavLink" href="/privacidad" label="Privacy" />');
+  }
+  return `<nav class="site-nav" aria-label="Main">
+  ${links.join('\n  ')}
+</nav>`;
 }
 
 function getBaseTemplate(cookiesStrict, csp) {
@@ -153,7 +171,6 @@ function getBaseTemplate(cookiesStrict, csp) {
   }
   const cookieBar = cookiesStrict ? '\n  <mini-include src="CookieConsentBar" />' : '';
   const consentScript = cookiesStrict ? '\n  <script src="/js/consent.js"></script>' : '';
-  const nav = getNavHtml(cookiesStrict);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -165,7 +182,7 @@ function getBaseTemplate(cookiesStrict, csp) {
     <span class="lava-blob lava-blob-2"></span>
     <span class="lava-blob lava-blob-3"></span>
   </div>${cookieBar}
-${nav}
+  <mini-include src="organisms/SiteHeader" />
   <slot />${consentScript}
 </body>
 </html>
@@ -406,9 +423,13 @@ body {
   color: var(--text-muted);
   text-decoration: none;
 }
-.site-nav a:hover { color: var(--accent); }
-.site-nav a[href="/"] { color: var(--text); }
-.site-nav a[href="/"]:hover { color: var(--accent); }
+.site-nav a:hover,
+.site-nav .site-nav-link:hover { color: var(--accent); }
+.site-nav a[href="/"],
+.site-nav .site-nav-link[href="/"] { color: var(--text); }
+.site-nav a[href="/"]:hover,
+.site-nav .site-nav-link[href="/"]:hover { color: var(--accent); }
+.site-nav .site-nav-link { text-decoration: none; }
 
 /* Landing — entrance animation */
 .landing {

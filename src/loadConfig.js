@@ -7,6 +7,7 @@ const DEFAULT_CONFIG = {
   outDir: 'dist',
   dataDir: 'src/data',
   atomicDesign: true,
+  dev: { port: 2323 },
   cookies: { strict: true },
   security: { csp: true, policyPages: true },
 };

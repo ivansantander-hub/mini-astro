@@ -19,8 +19,9 @@ El CLI de mini-astro se ejecuta con **`npx mini-astro`** o **`mini-astro`** si e
   - Banner de cookies estricto (Sí/No)
   - Generación de páginas de políticas (Cookies y Privacidad)
   - CSP estricta por defecto
+  - **Puerto del dev server** (por defecto **2323**); se guarda en `mini-astro.config.js` como `dev.port`
   - **Package manager**: **pnpm** (por defecto), **yarn** o **npm**
-- Con las respuestas llama a **create** y genera el proyecto. Al terminar imprime los comandos para instalar y arrancar (p. ej. `cd <nombre>`, `pnpm install`, `pnpm dev`).
+- Con las respuestas llama a **create** y genera el proyecto. Al terminar imprime el puerto elegido y los comandos para instalar y arrancar.
 
 ### `create [nombre]`
 
@@ -73,6 +74,11 @@ El CLI de mini-astro se ejecuta con **`npx mini-astro`** o **`mini-astro`** si e
 - **Descripción**: Escribe en stdout el script de autocompletado para la shell. Instalación:
   - **Bash**: `source <(mini-astro completion bash)` (o añadir a `~/.bashrc`).
   - **Zsh**: `source <(mini-astro completion zsh)` (o añadir a `~/.zshrc`).
+
+### `add [type]`
+
+- **Uso**: `mini-astro add` o `mini-astro add atom`
+- **Descripción**: Modo interactivo para crear cualquier nivel de Atomic Design. Si no pasas **type**, pregunta qué crear (atom / molecule / organism / template / page). Luego pide el **nombre** (y para páginas, el **layout** por defecto). Equivalente a ejecutar `component`, `template` o `route` sin argumentos para que pidan los datos.
 
 ### `help [comando]`
 
