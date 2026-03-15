@@ -127,7 +127,12 @@ function getBaseTemplate(cookiesStrict, csp) {
 <head>
   ${head}
 </head>
-<body>${cookieBar}
+<body>
+  <div class="lava-bg" aria-hidden="true">
+    <span class="lava-blob lava-blob-1"></span>
+    <span class="lava-blob lava-blob-2"></span>
+    <span class="lava-blob lava-blob-3"></span>
+  </div>${cookieBar}
 ${nav}
   <slot />${consentScript}
 </body>
@@ -148,13 +153,11 @@ title: Home
     <h1 class="landing-title">Hello humans</h1>
     <p class="landing-tagline">A minimal start. Edit <code>src/pages/index.html</code> and make it yours.</p>
   </div>
-  <section class="landing-demo" aria-label="Example component">
-    <h2 class="landing-demo-title">Example component</h2>
-    <p class="landing-demo-desc">Vanilla CSS hover + focus. Use as reference for your own components.</p>
+  <section class="landing-demo" aria-label="Card example">
+    <h2 class="landing-demo-title">Card</h2>
+    <p class="landing-demo-desc">Hover for a subtle lift. Styled in <code>theme.css</code>.</p>
     <div class="demo-card">
-      <span class="demo-card-badge">Component</span>
-      <h3 class="demo-card-heading">Card with animation</h3>
-      <p class="demo-card-text">Hover or focus this card. All styles in <code>public/css/theme.css</code>.</p>
+      <p class="demo-card-text">Hover or focus to see the effect.</p>
     </div>
     <p class="landing-consent-hint" id="consent-hint">Cookie choice: <strong id="consent-value">—</strong></p>
   </section>${policyLinks}
@@ -270,10 +273,77 @@ body {
   background: var(--bg);
   background-image: var(--bg-gradient);
   min-height: 100vh;
+  position: relative;
+}
+
+/* Lava lamp — slow organic blobs (no JS, reduced motion respected) */
+.lava-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lava-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lava-blob {
+    animation: lava-float 24s ease-in-out infinite;
+  }
+  .lava-blob-1 {
+    width: min(80vmax, 480px);
+    height: min(80vmax, 480px);
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.22) 0%, transparent 70%);
+    top: -15%;
+    left: -10%;
+    animation-duration: 22s;
+    animation-delay: 0s;
+  }
+  .lava-blob-2 {
+    width: min(60vmax, 360px);
+    height: min(60vmax, 360px);
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+    bottom: -10%;
+    right: -5%;
+    animation-duration: 28s;
+    animation-delay: -7s;
+  }
+  .lava-blob-3 {
+    width: min(50vmax, 320px);
+    height: min(50vmax, 320px);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.12) 0%, transparent 70%);
+    top: 40%;
+    left: 50%;
+    animation-duration: 26s;
+    animation-delay: -14s;
+  }
+}
+@keyframes lava-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(5%, -8%) scale(1.08); }
+  50% { transform: translate(-6%, 4%) scale(0.95); }
+  75% { transform: translate(4%, 6%) scale(1.05); }
+}
+.lava-blob-2 { animation-name: lava-float-alt; }
+@keyframes lava-float-alt {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-4%, 5%) scale(1.06); }
+  66% { transform: translate(6%, -4%) scale(0.97); }
+}
+.lava-blob-3 { animation-name: lava-float-slow; }
+@keyframes lava-float-slow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(calc(-50% + 8%), calc(-50% - 6%)) scale(1.1); }
 }
 
 /* Site nav — layout for all pages */
 .site-nav {
+  position: relative;
+  z-index: 1;
   padding: var(--space) 1.5rem;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   display: flex;
@@ -295,6 +365,8 @@ body {
 
 /* Landing — entrance animation */
 .landing {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -303,7 +375,11 @@ body {
   padding: var(--space);
   text-align: center;
 }
-.landing-hero { max-width: 42ch; }
+.landing-hero {
+  max-width: 42ch;
+  overflow: visible;
+  padding-right: 0.2em;
+}
 .landing-title {
   font-family: var(--font-display);
   font-weight: 800;
@@ -311,6 +387,8 @@ body {
   line-height: 1.05;
   letter-spacing: -0.04em;
   margin: 0 0 0.4em;
+  padding-right: 0.08em;
+  overflow: visible;
   background: linear-gradient(135deg, #fff 0%, var(--accent) 35%, var(--yellow) 65%, var(--text-muted) 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
