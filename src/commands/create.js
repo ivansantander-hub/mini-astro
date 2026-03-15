@@ -66,7 +66,10 @@ export async function runCreate(projectDir, projectName, opts = {}) {
     fs.writeFileSync(path.join(projectDir, 'src', 'pages', 'privacidad.html'), getPrivacidadPage(), 'utf8');
   }
 
-  const siteJson = { title: name, repository: '' };
+  const siteJson = {
+    title: name,
+    repository: 'https://github.com/ivansantander-hub/mini-astro',
+  };
   fs.writeFileSync(path.join(projectDir, 'src', 'data', 'site.json'), JSON.stringify(siteJson, null, 2), 'utf8');
 
   const config = `export default {
