@@ -38,6 +38,7 @@ export async function runComponent(cwd, name, layer = 'molecules') {
   if (fs.existsSync(filePath)) {
     throw new Error(`Component already exists: ${filePath}`);
   }
+  fs.mkdirSync(compDir, { recursive: true });
 
   const tagName = name.replace(/\.html$/, '').replace(/-/g, '');
   const content = `<div class="${tagName.toLowerCase()}">

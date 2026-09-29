@@ -5,19 +5,29 @@ A project using mini-astro can define a **`mini-astro.config.js`** file at the r
 ## Location and loading
 
 - **Location**: project root (where you run `mini-astro build` or `mini-astro dev`, or the directory given with `-C, --cwd`).
-- **Loading**: at runtime with `import(pathToFileURL(configPath).href)`. It must be a valid module (e.g. with `"type": "module"` in the project’s `package.json` or `.mjs` extension if applicable).
+- **Loading**: at runtime with `import(pathToFileURL(configPath).href)`. It must be a valid ES module (e.g. with `"type": "module"` in the project’s `package.json`) whose default export is an object (`export default { … }`).
+- **Errors**: if the file exists but cannot be loaded, throws while loading, or does not export an object, the build (and `dev`) fails with the reason. There is no silent fallback to the defaults, which would build from or to the wrong directories.
 
 ## Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `srcDir` | `string` | `'src'` | Source directory (contains `pages/`, `templates/`, `atoms/`, etc.). |
-| `outDir` | `string` | `'dist'` | Build output directory. |
-| `dataDir` | `string` | `'src/data'` | Directory from which JSON data is loaded (path relative to cwd). |
-| `atomicDesign` | `boolean` | `true` | Respect Atomic Design structure (atoms, molecules, organisms). Does not disable resolution in those folders in the current implementation. |
-| `dev` | `object` | `{ port: 2323 }` | Dev server port (used by `mini-astro dev` and shown in `init`). |
-| `cookies` | `object` | `{ strict: true }` | If `strict` is `true`, the scaffold includes CookieConsentBar; it is not injected automatically into existing builds. Mainly for init/create. |
-| `security` | `object` | `{ csp: true, policyPages: true }` | Security options: CSP and policy page generation in the scaffold. |
+| `srcDir` | `string` | `'src'` | Source directory (contains `pages/`, `templates/`, `atoms/`, `molecules/`, `organisms/`). Components are resolved against it. |
+| `outDir` | `string` | `'dist'` | Build output directory. Must not be the project root or overlap `srcDir`. |
+| `dataDir` | `string` | `'src/data'` | Directory from which data is loaded (`*.json`, `*.js`, `*.mjs`; path relative to cwd). |
+| `dev.port` | `number` | `2323` | Dev server port. The `PORT` env variable overrides it. |
+| `security.csp` | `boolean \| string` | `true` | CSP `<meta>` injected by the build: `true` = default strict policy, a string = that policy, `false` = none. See [Security](09-security.md). |
+
+The cookie consent banner and the policy pages are **not** config options: they are chosen when the project is created (`create` / `init`) and are just files in your project afterwards.
+
+## Validation
+
+After merging, the config is validated; an invalid value fails the build with a message naming the key:
+
+- `srcDir`, `outDir`, `dataDir`: non-empty strings.
+- `outDir`: must not be the project root, and must not contain or be inside `srcDir` (the stale-output cleanup and the dev watcher rely on this).
+- `dev.port`: an integer from 0 to 65535.
+- `security.csp`: `true`, `false` or a policy string.
 
 ## Minimal example
 
@@ -30,20 +40,19 @@ export default {
 };
 ```
 
-## Example with relaxed security
+## Example with a custom CSP and port
 
 ```js
 // mini-astro.config.js
 export default {
-  srcDir: 'src',
-  outDir: 'dist',
-  dataDir: 'src/data',
-  atomicDesign: true,
-  dev: { port: 2323 },
-  cookies: { strict: false },
-  security: { csp: false, policyPages: false },
+  dev: { port: 3000 },
+  security: {
+    csp: "default-src 'self'; img-src 'self' data: https://images.example.com",
+  },
 };
 ```
+
+Set `security: { csp: false }` to disable the CSP meta.
 
 ## Internal default values
 
@@ -54,22 +63,22 @@ const DEFAULT_CONFIG = {
   srcDir: 'src',
   outDir: 'dist',
   dataDir: 'src/data',
-  atomicDesign: true,
   dev: { port: 2323 },
-  cookies: { strict: true },
-  security: { csp: true, policyPages: true },
+  security: { csp: true },
 };
 ```
 
-If `mini-astro.config.js` does not exist, this object is used as-is. If it exists, a shallow merge is done: `{ ...DEFAULT_CONFIG, ...userConfig }`, so you do not need to repeat every key.
+If `mini-astro.config.js` does not exist, this object is used as-is. If it exists, it is **deep-merged**: nested objects are merged key by key, so `security: { csp: false }` or `dev: { port: 3000 }` keeps the other defaults and you do not need to repeat every key.
 
 ## Resolved paths
 
 - **Pages directory**: `path.resolve(cwd, config.srcDir, 'pages')`
 - **Templates directory**: `path.resolve(cwd, config.srcDir, 'templates')`
+- **Components**: `path.resolve(cwd, config.srcDir, 'atoms' | 'molecules' | 'organisms')`
 - **Data directory**: `path.resolve(cwd, config.dataDir)` (dataDir can be relative to cwd, e.g. `'src/data'`)
 - **Output**: `path.resolve(cwd, config.outDir)`
 - **Public**: `path.join(cwd, 'public')` (fixed; not configurable in the current version)
+- **Build state**: `path.join(cwd, '.mini-astro')` (manifest of written files; add it to `.gitignore`)
 
 ## Next step
 

@@ -13,14 +13,23 @@ import { runAdd } from './src/commands/add.js';
 import { runCreate } from './src/commands/create.js';
 import { MAIN_HELP, COMMAND_HELP } from './src/help.js';
 import { runCompletion } from './src/completion.js';
+import { closePrompts } from './src/prompt.js';
 
-const { values, positionals } = parseArgs({
-  options: {
-    cwd: { type: 'string', short: 'C' },
-    help: { type: 'boolean', short: 'h', default: false },
-  },
-  allowPositionals: true,
-});
+let values;
+let positionals;
+try {
+  ({ values, positionals } = parseArgs({
+    options: {
+      cwd: { type: 'string', short: 'C' },
+      help: { type: 'boolean', short: 'h', default: false },
+    },
+    allowPositionals: true,
+  }));
+} catch (err) {
+  console.error(err.message);
+  console.log('Run mini-astro help for usage.');
+  process.exit(1);
+}
 
 const [cmd, ...rest] = positionals || [];
 
@@ -94,8 +103,6 @@ async function main() {
         break;
       case 'route':
       case 'page':
-      case 'add':
-        if (cmd === 'add' && rest[0] === 'page') rest.shift();
         await runRoute(cwd, rest[0]);
         break;
       case 'component':
@@ -105,7 +112,12 @@ async function main() {
         await runTemplate(cwd, rest[0]);
         break;
       case 'add':
-        await runAdd(cwd, rest);
+        // `add page <route>` creates the page directly; anything else is the interactive flow.
+        if (rest[0] === 'page' && rest[1]) {
+          await runRoute(cwd, rest[1]);
+        } else {
+          await runAdd(cwd, rest);
+        }
         break;
       default:
         console.error(`Unknown command: ${cmd}`);
@@ -113,9 +125,11 @@ async function main() {
         process.exit(1);
     }
   } catch (err) {
+    closePrompts();
     console.error(err.message || err);
     process.exit(1);
   }
+  if (cmd !== 'dev') closePrompts();
 }
 
 main();

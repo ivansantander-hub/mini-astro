@@ -34,14 +34,18 @@ The scaffold includes an example **atom** (`NavLink`) and an **organism** (`Site
 
 ## Quarks (level 0)
 
-- **Not components**: they are values (colors, spacing, typography, borders, shadows).
+- **Not components**: they are values (colors, spacing, typography, borders, shadows). They cannot be used with `<mini-include>`; consume them from CSS or a build step.
 - Single source of truth for design. mini-astro includes `src/quarks/tokens.json` by default; your `public/css/theme.css` can reflect those tokens (CSS variables).
 - Command: `mini-astro quarks` shows the path to `quarks/` and its contents.
 
 ## Atoms, molecules, organisms
 
-- Referenced with `<mini-include src="Name" />` (or `atoms/Name`, `molecules/Name`, `organisms/Name`).
-- **Resolution**: if layer is not specified, search order is atoms → molecules → organisms; first match wins.
+- Referenced with `<mini-include src="Name" />` (or `atoms/Name`, `molecules/Name`, `organisms/Name`, or a path relative to the including file such as `./Name` or `../atoms/Name`).
+- **Resolution** (against the configured `srcDir`):
+  - `src="Name"` → `<srcDir>/atoms/Name.html`, then `molecules/`, then `organisms/`; first match wins.
+  - `src="atoms/Name"` → `<srcDir>/atoms/Name.html`.
+  - `src="./Name"` / `src="../atoms/Name"` → relative to the file that contains the include.
+  - A component that is not found fails the build, listing the paths tried.
 - **Names**: PascalCase, file `Name.html` (e.g. `CookieConsentBar.html`).
 
 ## Templates and pages

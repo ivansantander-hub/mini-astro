@@ -66,7 +66,8 @@ mini-astro generates **clean URLs** by default:
 
 - **Root**: `src/pages/index.html` → `dist/index.html` → URL `/`.
 - **Other pages**: `src/pages/foo.html` → `dist/foo/index.html`, so the URL is `/foo` or `/foo/`. The server (dev server or static host) resolves via **directory index** (`/foo/` → `foo/index.html`).
-- The **dev server** also accepts `/foo` without a trailing slash and serves `foo/index.html` (or `foo.html` in older builds).
+- **Folder indexes**: `src/pages/blog/index.html` → `dist/blog/index.html` (URL `/blog`). Having both `blog.html` and `blog/index.html` is a build error, since both would produce `dist/blog/index.html`.
+- The **dev server** also accepts `/foo` without a trailing slash and serves `foo/index.html` (or `foo.html` if that file exists instead).
 
 So you navigate to `/cookies` and not `/cookies.html`. In production, any host that resolves directory indexes (Nginx, Apache, Netlify, Vercel, etc.) serves these URLs without extra configuration.
 

@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES = path.join(__dirname, '../../templates');
 
+const SCAFFOLD_CSP =
+  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'";
+
 /**
  * Create a new project (scaffold)
  * @param {string} projectDir - absolute path where to create
@@ -69,21 +72,21 @@ Design tokens — colors, spacing, typography, radii. Single source of truth for
   // Atom: NavLink (Atomic Design level 1)
   fs.writeFileSync(path.join(projectDir, 'src', 'atoms', 'NavLink.html'), getNavLinkAtom(), 'utf8');
   // Organism: SiteHeader (Atomic Design level 3), uses NavLink
-  fs.writeFileSync(path.join(projectDir, 'src', 'organisms', 'SiteHeader.html'), getSiteHeaderOrganism(cookiesStrict), 'utf8');
+  fs.writeFileSync(path.join(projectDir, 'src', 'organisms', 'SiteHeader.html'), getSiteHeaderOrganism(policyPages), 'utf8');
 
   // Base template (uses organism SiteHeader)
-  const baseTemplate = getBaseTemplate(cookiesStrict, csp);
+  const baseTemplate = getBaseTemplate(cookiesStrict);
   fs.writeFileSync(path.join(projectDir, 'src', 'templates', 'Base.html'), baseTemplate, 'utf8');
 
   // index page
-  const indexPage = getIndexPage(cookiesStrict);
+  const indexPage = getIndexPage(policyPages);
   fs.writeFileSync(path.join(projectDir, 'src', 'pages', 'index.html'), indexPage, 'utf8');
 
   // CookieConsentBar molecule + external script (CSP-safe) + developer doc
   if (cookiesStrict) {
     fs.writeFileSync(
       path.join(projectDir, 'src', 'molecules', 'CookieConsentBar.html'),
-      getCookieConsentBar(),
+      getCookieConsentBar(policyPages),
       'utf8'
     );
     fs.writeFileSync(path.join(projectDir, 'public', 'js', 'consent.js'), getConsentJs(), 'utf8');
@@ -108,17 +111,19 @@ Design tokens — colors, spacing, typography, radii. Single source of truth for
   fs.writeFileSync(path.join(projectDir, 'src', 'data', 'site.json'), JSON.stringify(siteJson, null, 2), 'utf8');
 
   const devPort = opts.devPort != null ? Number(opts.devPort) : 2323;
+  // The build injects this policy into every page (security.csp). Google Fonts
+  // is allowed because the starter theme uses it.
+  const cspValue = csp ? JSON.stringify(SCAFFOLD_CSP) : 'false';
   const config = `export default {
   srcDir: 'src',
   outDir: 'dist',
   dataDir: 'src/data',
-  atomicDesign: true,
   dev: { port: ${devPort} },
-  cookies: { strict: ${cookiesStrict} },
-  security: { csp: ${csp}, policyPages: ${policyPages} },
+  security: { csp: ${cspValue} },
 };
 `;
   fs.writeFileSync(path.join(projectDir, 'mini-astro.config.js'), config, 'utf8');
+  fs.writeFileSync(path.join(projectDir, '.gitignore'), 'node_modules/\ndist/\n.mini-astro/\n', 'utf8');
 
   const pkg = {
     name: name.replace(/\s+/g, '-').toLowerCase(),
@@ -159,11 +164,11 @@ function getNavActiveJs() {
 }
 
 /** Organism: site header with nav (Atomic Design level 3). Uses atoms/NavLink */
-function getSiteHeaderOrganism(cookiesStrict) {
+function getSiteHeaderOrganism(policyPages) {
   const links = [
     '<mini-include src="atoms/NavLink" href="/" label="Home" />',
   ];
-  if (cookiesStrict) {
+  if (policyPages) {
     links.push('<mini-include src="atoms/NavLink" href="/cookies" label="Cookies" />');
     links.push('<mini-include src="atoms/NavLink" href="/privacy" label="Privacy" />');
   }
@@ -172,17 +177,14 @@ function getSiteHeaderOrganism(cookiesStrict) {
 </nav>`;
 }
 
-function getBaseTemplate(cookiesStrict, csp) {
-  let head = `<meta charset="UTF-8">
+function getBaseTemplate(cookiesStrict) {
+  const head = `<meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/theme.css">`;
-  if (csp) {
-    head += `\n  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; img-src 'self' data:;">`;
-  }
   const cookieBar = cookiesStrict ? '\n  <mini-include src="CookieConsentBar" />' : '';
   const consentScript = cookiesStrict ? '\n  <script src="/js/consent.js"></script>' : '';
   return `<!DOCTYPE html>
@@ -204,8 +206,8 @@ function getBaseTemplate(cookiesStrict, csp) {
 `;
 }
 
-function getIndexPage(cookiesStrict) {
-  const policyLinks = cookiesStrict
+function getIndexPage(policyPages) {
+  const policyLinks = policyPages
     ? '\n  <footer class="landing-footer"><a href="/cookies">Cookie Policy</a> · <a href="/privacy">Privacy</a></footer>'
     : '';
   return `---
@@ -230,13 +232,15 @@ title: Home
 `;
 }
 
-function getCookieConsentBar() {
+function getCookieConsentBar(policyPages) {
+  const links = policyPages
+    ? '\n    <p class="cookie-consent-links"><a href="/cookies">Cookie Policy</a> · <a href="/privacy">Privacy</a></p>'
+    : '';
   return `<!-- Cookie consent modal. Logic in /js/consent.js (CSP-safe). Use body.dataset.consent or event "mini-astro-consent". -->
 <div class="cookie-consent-overlay" id="cookie-consent" role="dialog" aria-modal="true" aria-label="Cookie consent" aria-live="polite" hidden>
   <div class="cookie-consent-card">
     <h2 class="cookie-consent-title">We value your privacy</h2>
-    <p class="cookie-consent-text">We use essential cookies to run the site. Optional cookies help us improve experience. You choose.</p>
-    <p class="cookie-consent-links"><a href="/cookies">Cookie Policy</a> · <a href="/privacy">Privacy</a></p>
+    <p class="cookie-consent-text">We use essential cookies to run the site. Optional cookies help us improve experience. You choose.</p>${links}
     <div class="cookie-consent-actions">
       <button type="button" id="cookie-decline" class="cookie-consent-decline">Decline optional</button>
       <button type="button" id="cookie-accept" class="cookie-consent-accept">Accept all</button>

@@ -53,17 +53,24 @@ mini-astro create [name] — Create new project
   build: `
 mini-astro build — Build static site to dist/
 
-  Uses mini-astro.config.js (srcDir, outDir). Output: clean URLs (ruta/index.html).
+  Uses mini-astro.config.js (srcDir, outDir, dataDir, security.csp).
+  Output: clean URLs — pages/about.html → about/index.html, pages/blog/index.html → blog/index.html.
+  {{ var }} is HTML-escaped; {{{ var }}} inserts raw HTML.
+  Files written by the previous build that were not written again are removed
+  (tracked in .mini-astro/manifest.json).
 `.trim(),
   dev: `
 mini-astro dev — Dev server + optional live reload
 
-  Port: 2323 by default (set in mini-astro.config.js dev.port at create, or PORT env). Host: 0.0.0.0. Needs chokidar for watch.
+  Port: dev.port in mini-astro.config.js (default 2323), or PORT env. Host: 0.0.0.0.
+  Watches srcDir, public/, dataDir and the config; rebuilds on add, change and delete.
+  A failed build keeps the server running and shows the error in the browser.
 `.trim(),
   quarks: `
 mini-astro quarks — Design tokens (Atomic level 0)
 
-  Quarks live in src/quarks/ (e.g. tokens.json). Not UI components; only tokens (colors, spacing, typography). Use theme.css or build to consume them.
+  Quarks live in src/quarks/ (e.g. tokens.json). Not UI components; only tokens (colors, spacing, typography).
+  They cannot be used with <mini-include>; consume them from CSS or a build step.
 `.trim(),
   component: `
 mini-astro component <name> [layer] — Add component (atoms | molecules | organisms)
@@ -72,6 +79,7 @@ mini-astro component <name> [layer] — Add component (atoms | molecules | organ
   layer  atom | molecule | organism  (default: molecule)
 
   Creates src/<layer>/<Name>.html. Use <mini-include src="Name" /> in pages/templates.
+  Components see the page context (frontmatter + site) plus their own attributes.
 `.trim(),
   template: `
 mini-astro template <name> — Add template (Atomic: layouts)
@@ -93,6 +101,7 @@ mini-astro add [type] — Interactive: create any Atomic level
 
   type   Optional. atom | molecule | organism | template | page
   If omitted, asks what to create. Then asks name (and layer for components, layout for pages).
+  mini-astro add page <route>   creates the page without prompts.
 `.trim(),
   completion: `
 mini-astro completion [bash|zsh] — Shell autocomplete
