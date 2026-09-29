@@ -9,6 +9,8 @@ The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if insta
 | `-C, --cwd <path>` | Project directory (where `mini-astro.config.js` is). Default: `process.cwd()`. |
 | `-h, --help` | Show help and exit. |
 
+An unknown option prints the error and `Run mini-astro help for usage.` and exits with code 1 (no stack trace). Errors from commands (e.g. a failed build) are printed as a single message and exit with code 1.
+
 ## Commands
 
 ### `init [name]`
@@ -21,7 +23,15 @@ The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if insta
   - Strict CSP by default
   - **Dev server port** (default **2323**); saved in `mini-astro.config.js` as `dev.port`
   - **Package manager**: **pnpm** (default), **yarn** or **npm**
+- Defaults are shown in brackets (e.g. `(y/n) [Y]`, `[2323]`); press Enter to accept them. For the yes/no questions only `n` means no.
 - With your answers it calls **create** and generates the project. When done it prints the chosen port and the commands to install and start.
+- **Scriptable**: answers are read from stdin in order, so `init` works with piped input (scripts, CI). Order: project name, cookie banner, policy pages, CSP, dev port, package manager. Once stdin ends, every remaining question uses its default.
+
+  ```bash
+  printf 'mysite\nn\nn\nn\n4321\nnpm\n' | mini-astro init
+  ```
+
+  If you pass the name as an argument (`init mysite`), the name question is skipped and the first line answers the cookie banner question.
 
 ### `create [name]`
 
@@ -29,7 +39,7 @@ The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if insta
 - **Description**:  
   - **With name** (`create my-site`): Creates the project in `<cwd>/my-site` without prompts. Uses default options (cookies, policy pages, CSP) and **pnpm** as package manager.  
   - **Without name** (`create`): Runs the **interactive** flow like **init** (name, cookies, policies, CSP, package manager).
-- Generates: Atomic Design folders + public/css (incl. `theme.css`), Base.html, “Hello humans” landing in index.html, CookieConsentBar and policy pages if applicable, site.json, config, package.json (with `packageManager: "pnpm@9.0.0"` if pnpm). If the directory already exists, throws an error.
+- Generates: Atomic Design folders (incl. `src/quarks/tokens.json`) + public/css (incl. `theme.css`), Base.html, “Hello humans” landing in index.html, CookieConsentBar and policy pages if applicable (links to the policy pages only when they are generated), site.json, `mini-astro.config.js` (with the CSP policy in `security.csp`), package.json and a `.gitignore` (`node_modules/`, `dist/`, `.mini-astro/`). If the directory already exists, throws an error.
 
 ### `new [name]`
 
@@ -39,18 +49,19 @@ The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if insta
 ### `build`
 
 - **Usage**: `mini-astro build` (from project root or with `-C`).
-- **Description**: Loads config, loads data from `dataDir`, copies `public/` to `outDir`, processes all pages in `src/pages/` (frontmatter, layout, slot, includes, vars) and writes the result to `outDir`. Prints the number of pages generated.
+- **Description**: Loads and validates config, loads data from `dataDir`, copies `public/` to `outDir`, processes all pages in `src/pages/` (frontmatter, layout, variables, includes, slot, CSP) and writes the result to `outDir`. Then removes files a previous build wrote that were not written again (tracked in `.mini-astro/manifest.json`). Prints the number of pages generated and, if any, the number of stale files removed.
+- Fails (exit code 1) on: invalid config, invalid data file, missing component, missing explicit layout, template without slot, two pages with the same output path.
 
 ### `dev`
 
 - **Usage**: `mini-astro dev`
-- **Description**: Runs a build and then starts an HTTP server that serves `outDir` (default `dist/`) on port **2323** (or `dev.port` from config, or `PORT` env). If **chokidar** is installed, it watches `srcDir` and on changes runs the build again and sends a live reload event to clients connected to `/__mini_astro_live`. Each HTML response injects a script that opens that SSE and reloads the page on event.
-- Without chokidar, the server still runs but there is no automatic reload.
+- **Description**: Runs a build and then starts an HTTP server that serves `outDir` (default `dist/`) on port **2323** (or `dev.port` from config; the `PORT` env overrides both; `PORT=0` picks a free port). With **chokidar**, it watches `srcDir`, `public/`, `dataDir` and the config file, rebuilds on add/change/delete and sends a live reload event to clients connected to `/__mini_astro_live`. Each HTML response injects a script that opens that SSE and reloads the page on event.
+- A failed build does not stop the server: HTML requests show the error until the next successful build. See [Dev server](11-dev-server.md).
 
-### `route <name>` / `page <name>` / `add [page] <name>`
+### `route <name>` / `page <name>` / `add page <name>`
 
 - **Usage**: `mini-astro route about`, `mini-astro page blog/post`, `mini-astro add page contact`
-- **Description**: Creates a page in `src/pages/` (Atomic: pages). `route blog/post` creates `src/pages/blog/post.html`; the URL will be `/blog/post`. Content: placeholder with `layout: Base` and title derived from the name. **page** and **add** are aliases of **route**; with **add**, if the first argument is `page` it is ignored.
+- **Description**: Creates a page in `src/pages/` (Atomic: pages). `route blog/post` creates `src/pages/blog/post.html`; the URL will be `/blog/post`. Content: placeholder with `layout: Base` and title derived from the name. **page** is an alias of **route**; `add page <name>` creates the page directly as well. If the page already exists, throws an error.
 
 ### `quarks`
 
@@ -60,7 +71,7 @@ The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if insta
 ### `component <name> [layer]`
 
 - **Usage**: `mini-astro component Button atom`, `mini-astro component Card molecule`, `mini-astro component Header organism`
-- **Description**: Creates a component in the given layer (default **molecule**). Layers: **atom** | **molecule** | **organism** (or plural: atoms, molecules, organisms). Creates `src/<layer>/<name>.html`.
+- **Description**: Creates a component in the given layer (default **molecule**). Layers: **atom** | **molecule** | **organism** (or plural: atoms, molecules, organisms). Creates `<srcDir>/<layer>/<name>.html`, creating the layer directory if it does not exist.
 
 ### `template <name>`
 
@@ -76,8 +87,9 @@ The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if insta
 
 ### `add [type]`
 
-- **Usage**: `mini-astro add` or `mini-astro add atom`
-- **Description**: Interactive mode to create any Atomic Design level. If you do not pass **type**, it asks what to create (atom / molecule / organism / template / page). Then it asks for the **name** (and for pages, the default **layout**). Equivalent to running `component`, `template` or `route` without arguments so they prompt for the data.
+- **Usage**: `mini-astro add`, `mini-astro add atom`, `mini-astro add template`, `mini-astro add page`
+- **Description**: Interactive mode to create any Atomic Design level. If you do not pass **type** (atom / molecule / organism / template / page), it asks what to create. Then it asks for the **name** (and for pages, the **layout**). Equivalent to running `component`, `template` or `route` without arguments so they prompt for the data. Requires an interactive terminal.
+- `mini-astro add page <route>` is the exception: it creates the page directly, without prompts (same as `route <route>`).
 
 ### `help [command]`
 
@@ -89,7 +101,10 @@ The mini-astro CLI is run with **`npx mini-astro`** or **`mini-astro`** if insta
 ```bash
 # Create project interactively
 npx mini-astro init
-npx mini-astro init my-portfolio
+npx mini-astro init my-site
+
+# Create project from a script (answers piped in order)
+printf 'mysite\nn\nn\nn\n4321\nnpm\n' | npx mini-astro init
 
 # Create project without prompts
 npx mini-astro create my-site

@@ -20,12 +20,13 @@ npx github:ivansantander-hub/mini-astro init
 When you run `init` you are asked:
 
 - **Project name**
-- **Strict cookie banner** (Yes/No): if enabled, the consent bar is generated and the user only has to click **Accept**; links to Cookie Policy and Privacy are included.
+- **Strict cookie banner** (Yes/No): if enabled, the consent bar is generated and the user only has to click **Accept**; links to Cookie Policy and Privacy are included when policy pages are generated.
 - **Policy pages** (Cookies and Privacy): Yes/No
-- **Strict CSP by default**: Yes/No
+- **Strict CSP by default**: Yes/No (stored as `security.csp` in `mini-astro.config.js`)
+- **Dev server port**: default 2323
 - **Package manager**: **pnpm** (default), **yarn** or **npm**. The project is created with scripts ready for the chosen manager.
 
-The project is created in a subfolder. At the end you see the commands to install dependencies and start the dev server (e.g. `pnpm install` and `pnpm dev`).
+The project is created in a subfolder. At the end you see the commands to install dependencies and start the dev server (e.g. `pnpm install` and `pnpm dev`). Answers can also be piped from a script; see [CLI](10-cli.md#init-name).
 
 **Option B — Direct (no prompts)**
 
@@ -42,30 +43,36 @@ pnpm dev
 
 ```
 my-site/
-  mini-astro.config.js
-  package.json          (with packageManager: "pnpm@9.0.0" if you chose pnpm)
+  .gitignore            (node_modules/, dist/, .mini-astro/)
+  mini-astro.config.js  (dirs, dev.port, security.csp)
+  package.json          (build / dev scripts)
+  COOKIE_CONSENT.md     (only if cookie banner)
   public/
     css/
       theme.css         (default theme: landing + cookie modal)
     js/
-      consent.js        (modal logic; only if cookies strict)
+      consent.js        (modal logic; only if cookie banner)
       nav-active.js     (navbar active state)
     img/
   src/
+    quarks/
+      tokens.json       (design tokens)
     atoms/
-    molecules/          (CookieConsentBar.html if cookies strict)
+      NavLink.html
+    molecules/          (CookieConsentBar.html if cookie banner)
     organisms/
+      SiteHeader.html   (navbar: Home, plus Cookies and Privacy if policy pages)
     templates/
-      Base.html        (layout with navbar: Home, Cookies, Privacy)
+      Base.html         (layout with the header)
     pages/
       index.html        (landing "Hello humans")
-      cookies.html
+      cookies.html      (if policy pages)
       privacy.html      (if policy pages)
     data/
       site.json
 ```
 
-The home page is a **modern landing** (“Hello humans”) with Syne + DM Sans typography and a dark theme. If you enabled cookies, a **consent modal** (Accept all / Decline optional) appears on load; the logic is in `public/js/consent.js` (CSP-compatible). See `COOKIE_CONSENT.md` for using the choice in your app.
+The home page is a **modern landing** (“Hello humans”) with Orbitron + DM Sans typography and a dark theme. If you enabled cookies, a **consent modal** (Accept all / Decline optional) appears on load; the logic is in `public/js/consent.js` (CSP-compatible). See `COOKIE_CONSENT.md` for using the choice in your app.
 
 ## 3. Local development
 
@@ -75,7 +82,7 @@ pnpm dev
 ```
 
 - Open **http://localhost:2323** (or the port in your config).
-- Edit files in `src/`; if chokidar is installed, the page will reload after each build.
+- Edit files in `src/`, `public/`, `src/data/` or the config; the page reloads after each build. If a build fails, the browser shows the error until you fix it.
 
 ## 4. Add a page
 
@@ -86,7 +93,7 @@ npx mini-astro route contact
 npx mini-astro route blog/my-post
 ```
 
-Or create by hand `src/pages/route.html` (or `src/pages/blog/my-post.html`). Each file must have at least:
+Or create by hand `src/pages/route.html` (or `src/pages/blog/my-post.html`; use `src/pages/blog/index.html` for `/blog`). A typical page:
 
 ```html
 ---
@@ -112,6 +119,8 @@ Then edit `src/molecules/Card.html` (or `src/organisms/Header.html`) and use it 
 <mini-include src="Card" title="Hello" />
 <mini-include src="organisms/Header" />
 ```
+
+Components see the page context (frontmatter and `site`) plus their own attributes. `{{ title }}` inside the component is HTML-escaped; use `{{{ html }}}` for a trusted value that contains HTML.
 
 ## 6. Use global data
 
@@ -139,7 +148,7 @@ pnpm build
 # or yarn build / npm run build
 ```
 
-Output goes to **`dist/`** (or your config’s `outDir`). You get all generated HTML and a copy of `public/` (css, js, img).
+Output goes to **`dist/`** (or your config’s `outDir`). You get all generated HTML (with the CSP meta from `security.csp`) and a copy of `public/` (css, js, img). Files from a previous build that no longer have a source (renamed or deleted pages, removed public files) are deleted; other files in `dist/` are left alone.
 
 ## 8. Deploy
 

@@ -1,30 +1,48 @@
 # Data
 
-mini-astro loads global data from **JSON** files in the data directory and exposes it on all pages under the **`site`** object.
+mini-astro loads global data from **JSON** and **JavaScript** files in the data directory and exposes it on all pages under the **`site`** object.
 
 ## Data directory
 
 - Default: **`src/data`** (configurable with `dataDir` in `mini-astro.config.js`).
 - Absolute path: `path.resolve(cwd, config.dataDir)`.
 - Only **files** in that directory are read (no subfolders).
-- Only files with extension **`.json`** are processed.
+- Files with extension **`.json`**, **`.js`** or **`.mjs`** are processed; other files are ignored.
 
 ## Loading
 
-- Each file `name.json` is parsed with `JSON.parse` and its content is assigned to **`site.name`** (base name without extension).
-- Example: `site.json` → content is in **`site.site`**. If `site.json` is `{ "title": "My site" }`, in templates and pages you use `{{ site.site.title }}`.
-- Another file `menu.json` → **`site.menu`** (array or object per the JSON).
+Each file becomes **`site.<name>`** (base name without extension):
 
-There is no support for `data.js` or other formats in this version.
+- **`name.json`** — parsed with `JSON.parse`. Invalid JSON fails the build with an error naming the file.
+- **`name.js` / `name.mjs`** — ES module whose default export is an object, or a function / async function that returns one. A file that fails to load fails the build naming the file.
+
+Examples:
+
+- `site.json` → content is in **`site.site`**. If `site.json` is `{ "title": "My site" }`, in templates and pages you use `{{ site.site.title }}`.
+- `menu.json` → **`site.menu`** (array or object per the JSON).
+- `build.js` → **`site.build`**:
+
+```js
+// src/data/build.js
+export default async function () {
+  return { year: new Date().getFullYear() };
+}
+```
+
+```html
+<footer>© {{ site.build.year }}</footer>
+```
+
+In `dev`, data files are watched and edits are picked up on the next rebuild.
 
 ## Use in pages and templates
 
-The `site` object is injected into **pageContext** together with the page frontmatter. You can use:
+The `site` object is injected into the context together with the template and page frontmatter. You can use:
 
 - **`{{ site.site.title }}`** — property of an object loaded from `site.json`.
-- **`{{ site.menu }}`** — for lists/objects loaded from `menu.json` (serialized to string when substituting; for complex lists you typically use it in components by passing a prop).
+- **`{{ site.menu }}`** — lists/objects are serialized to JSON when substituted; for complex lists you typically pick values explicitly (`{{ site.menu.home }}`) or pass them to components as props.
 
-Variables are resolved with **replaceVars**: the key can contain dots (e.g. `site.site.title`) and is resolved over the context. Values are stringified when substituted.
+The key can contain dots (e.g. `site.site.title`) and is resolved over the context. `{{ }}` escapes the value as HTML; use `{{{ site.x.html }}}` only for trusted values that intentionally contain HTML. Values are inserted as-is and never re-evaluated, so `{{ … }}` inside a data value appears literally in the output.
 
 ## Example structure
 
@@ -32,13 +50,14 @@ Variables are resolved with **replaceVars**: the key can contain dots (e.g. `sit
 src/data/
   site.json    → site.site
   menu.json    → site.menu
+  build.js     → site.build
 ```
 
 **site.json:**
 
 ```json
 {
-  "title": "My portfolio",
+  "title": "My site",
   "description": "Welcome"
 }
 ```
